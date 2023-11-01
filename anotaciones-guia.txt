@@ -1,0 +1,8 @@
+Todas las clases implementaran una interfaz ICrud que tiene la firma adecuada
+para poder implementarlas y poder reutilizar codigo.
+
+Dotend => instalar composer require vlucas/phpdotenv
+
+No funciona el Dotenv
+
+No se si en mesa poner o no el codigoMesa.
