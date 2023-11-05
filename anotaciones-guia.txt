@@ -1,8 +1,24 @@
-Todas las clases implementaran una interfaz ICrud que tiene la firma adecuada
-para poder implementarlas y poder reutilizar codigo.
+Dotend => instalar composer require vlucas/phpdotenv  
 
-Dotend => instalar composer require vlucas/phpdotenv
+hacerlo correr al SLIM:
+abrir xampp
 
-No funciona el Dotenv
+php -S localhost:666 -t app
 
-No se si en mesa poner o no el codigoMesa.
+luego en el navegador poner localhost:666 
+
+============================================================================
+        LA BAJA ES LOGICA => SU ESTADO PASA A BAJA NO SE ELIMINAR
+
+
+=============================================================================
+                                PEDIDOS:
+Cuando haga un pedido deberia de chequear que no este dado de baja el proudcot
+y que la mesa no este con estado 'BAJA'.
+
+Ver el tema de los tiempos sobre todo,
+
+
+
+
+ 

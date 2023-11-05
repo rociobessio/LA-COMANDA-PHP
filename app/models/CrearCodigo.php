@@ -4,8 +4,7 @@
      * Esta function me permitira generar un codigo de 
      * caracteres y retornarla segun la longitud deseada.
      * 
-     * @param int $longitud la longitud de la cadena.
-     * @return string el codigo final.
+     * @param int $longitud la longitud de la cadena. 
      */
     function CrearCodigo($longitud)
     {
@@ -16,5 +15,5 @@
             $codigo .= $caracteres[rand(0, strlen($caracteres) - 1)];
         }
 
-        return $codigo;
+        return $codigo; // Asegúrate de que el código se retorne aquí
     }

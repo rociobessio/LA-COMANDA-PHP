@@ -1,12 +1,12 @@
 <?php
 
-    require_once "./app/models/Mesa.php";
-    require_once "./app/interfaces/IApiUsable.php";
+    include_once "./models/Mesa.php";
+    require_once "./interfaces/IApiUsable.php";
 
     class MesaController extends Mesa implements IApiUsable{
 
         //-->Los estados de la mesa pueden ser:
-        public static $estados = array("con cliente esperando pedido", "con cliente comiendo", "con cliente pagando", "cerrada");
+        public static $estados = array("con cliente esperando pedido", "con cliente comiendo", "con cliente pagando", "cerrada", "abierta","esperando");
 
         public static function CargarUno($request, $response, $args)
         {
@@ -32,6 +32,7 @@
          * 'mesas'.
          */
 	    public static function TraerTodos($request, $response, $args){
+            echo 'traer todos';
             $lista = Mesa::obtenerTodos();
             $payload = json_encode(array("listaMesas" => $lista));
 
@@ -44,6 +45,7 @@
          * especifico mediante le id de la mesa.
          */
         public static function TraerUno($request, $response, $args){
+            echo'traer uno';
             $val = $args['valor'];
             $mesa = Mesa::obtenerUno($val);//-->Me traigo uno.
             $payload = json_encode($mesa);
@@ -58,8 +60,8 @@
         public static function BorrarUno($request, $response, $args){
             $idEliminar = $args['id'];
 
-            if(Mesa::obtenerUno($idEliminar)){//-->Me fijo si existe.
-                Mesa::borrar($idEliminar);
+            if(Mesa::obtenerUno(intval($idEliminar))){//-->Me fijo si existe.
+                Mesa::borrar(intval($idEliminar));
                 $payload = json_encode(array("Mensaje"=>"La mesa se ha dado de baja correctamente!"));
             }
             else{
@@ -74,14 +76,16 @@
 	    public static function ModificarUno($request, $response, $args){
             $idModificar = $args['id'];
 
-            $mesa = Mesa::obtenerUno($idModificar);
+            $mesa = Mesa::obtenerUno(intval($idModificar));
+            // var_dump($mesa);
             if($mesa !== false){
                 $parametros = $request->getParsedBody();
 
                 $pudoActualizar = false;
                 if (isset($parametros['estado'])) {
                   $pudoActualizar = true;
-                  $mesa->estado = $parametros['estado'];
+                //   $mesa->setEstado($parametros['estado']);
+                $mesa->setEstado($parametros['estado']);
                 }
                 if ($pudoActualizar) {
                   Mesa::modificar($mesa);
