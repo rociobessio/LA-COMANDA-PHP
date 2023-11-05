@@ -1,0 +1,245 @@
+{
+	"info": {
+		"_postman_id": "ebd7b533-7078-45f0-80c5-452412f16245",
+		"name": "TRABAJO PRACTICO - PROG III",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24011357"
+	},
+	"item": [
+		{
+			"name": "LISTAR",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:666/pedidos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"pedidos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MODIFICAR",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "estado",
+							"value": "cerrada",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "nombre",
+							"value": "Helado 3 bochas",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sector",
+							"value": "CandyBar",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "tipo",
+							"value": "Postre",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "precio",
+							"value": "1100",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "nombreCliente",
+							"value": "Marcos Acuña",
+							"type": "text"
+						},
+						{
+							"key": "rol",
+							"value": "Socio",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "nombre",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "estado",
+							"value": "listo para servir",
+							"type": "text"
+						},
+						{
+							"key": "idModificar",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:666/pedidos/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"pedidos",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ELIMINAR",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:666/pedidos/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"pedidos",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CARGAR",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "nombre",
+							"value": "Fanta",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "sector",
+							"value": "Cocina",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "precio",
+							"value": "800",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "tipo",
+							"value": "Bebida",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "nombre",
+							"value": "Romina",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "rol",
+							"value": "Socio",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "idProducto",
+							"value": "12",
+							"type": "text"
+						},
+						{
+							"key": "cantidad",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "idMesa",
+							"value": "5",
+							"type": "text"
+						},
+						{
+							"key": "fotoMesa",
+							"type": "file",
+							"src": "/C:/Users/Rocio/Downloads/family_smiling_dinner.webp"
+						},
+						{
+							"key": "nombreCliente",
+							"value": "Estela Ramirez",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:666/pedidos/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"pedidos",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OBTENER UNO",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:666/pedidos/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"pedidos",
+						"4"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
