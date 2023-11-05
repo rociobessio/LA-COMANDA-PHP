@@ -19,6 +19,10 @@ y que la mesa no este con estado 'BAJA'.
 Ver el tema de los tiempos sobre todo,
 
 
+=============================================================================
+Constructores.
+
+
 
 
  
