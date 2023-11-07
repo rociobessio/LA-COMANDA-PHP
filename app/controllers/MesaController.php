@@ -6,7 +6,7 @@
     class MesaController extends Mesa implements IApiUsable{
 
         //-->Los estados de la mesa pueden ser:
-        public static $estados = array("con cliente esperando pedido", "con cliente comiendo", "con cliente pagando", "cerrada", "abierta","esperando");
+        public static $estados = array("con cliente esperando pedido", "con cliente comiendo", "con cliente pagando", "cerrada",);
 
         public static function CargarUno($request, $response, $args)
         {

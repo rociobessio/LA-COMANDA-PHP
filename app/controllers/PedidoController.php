@@ -39,8 +39,8 @@
                 }
               
                 //-->Cambio el estado de la mesa
-                if($idMesa->getEstado() == "abierta"){
-                    $idMesa->setEstado("esperando");
+                if($idMesa->getEstado() == "cerrada"){
+                    $idMesa->setEstado("con cliente esperando pedido");
                     Mesa::modificar($idMesa);
                 }
 

@@ -13,6 +13,8 @@ use Slim\Cookie\Cookie;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+require_once "./middlewares/Verificador.php"; 
+
 require_once './db/accesoDB.php'; 
 require_once './controllers/PedidoController.php';
 require_once './controllers/EmpleadoController.php';
@@ -31,45 +33,45 @@ $app = AppFactory::create();
 
 // $app->setBasePath('/Comanda');
 // echo 'aaaa';
-$app->addRoutingMiddleware();
+// $app->addRoutingMiddleware();
 $app->addBodyParsingMiddleware();
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 //-->Mesas:
 $app->group('/mesas',function (RouteCollectorProxy $group){
-    $group->get('[/]',\MesaController::class . '::TraerTodos');
-    $group->get('/{id}',\MesaController::class . '::TraerUno');
-    $group->post('[/]', \MesaController::class . '::CargarUno');
-    $group->put('/{id}', \MesaController::class . '::ModificarUno');
-    $group->delete('/{id}', \MesaController::class . '::BorrarUno');
+    $group->get('[/]',\MesaController::class . '::TraerTodos')->add(\Verificador::class . '::ValidarSocio');
+    $group->get('/{id}',\MesaController::class . '::TraerUno')->add(\Verificador::class . '::ValidarSocio');
+    $group->post('[/]', \MesaController::class . '::CargarUno')->add(\Verificador::class . '::ValidarSocio');
+    $group->put('/{id}', \MesaController::class . '::ModificarUno')->add(\Verificador::class . '::ValidarSocio');
+    $group->delete('/{id}', \MesaController::class . '::BorrarUno')->add(\Verificador::class . '::ValidarSocio');
 });
 
 //-->Productos
 $app->group('/productos',function (RouteCollectorProxy $group){
-    $group->get('[/]',\ProductoController::class . '::TraerTodos');
-    $group->get('/{id}',\ProductoController::class . '::TraerUno');
-    $group->post('[/]', \ProductoController::class . '::CargarUno');
-    $group->put('/{id}', \ProductoController::class . '::ModificarUno');
-    $group->delete('/{id}', \ProductoController::class . '::BorrarUno');
+    $group->get('[/]',\ProductoController::class . '::TraerTodos')->add(\Verificador::class . '::ValidarSocio');
+    $group->get('/{id}',\ProductoController::class . '::TraerUno')->add(\Verificador::class . '::ValidarSocio');
+    $group->post('[/]', \ProductoController::class . '::CargarUno')->add(\Verificador::class . '::ValidarSocio');
+    $group->put('/{id}', \ProductoController::class . '::ModificarUno')->add(\Verificador::class . '::ValidarSocio');
+    $group->delete('/{id}', \ProductoController::class . '::BorrarUno')->add(\Verificador::class . '::ValidarSocio');
 });
 
 // -->Empleados
 $app->group('/empleados',function (RouteCollectorProxy $group){
-    $group->get('[/]',\EmpleadoController::class . '::TraerTodos');
-    $group->get('/{id}',\EmpleadoController::class . '::TraerUno');
-    $group->post('[/]', \EmpleadoController::class . '::CargarUno');
-    $group->put('/{id}', \EmpleadoController::class . '::ModificarUno');
-    $group->delete('/{id}', \EmpleadoController::class . '::BorrarUno');
+    $group->get('[/]',\EmpleadoController::class . '::TraerTodos')->add(\Verificador::class . '::ValidarSocio');
+    $group->get('/{id}',\EmpleadoController::class . '::TraerUno')->add(\Verificador::class . '::ValidarSocio');
+    $group->post('[/]', \EmpleadoController::class . '::CargarUno')->add(\Verificador::class . '::ValidarSocio');
+    $group->put('/{id}', \EmpleadoController::class . '::ModificarUno')->add(\Verificador::class . '::ValidarSocio');
+    $group->delete('/{id}', \EmpleadoController::class . '::BorrarUno')->add(\Verificador::class . '::ValidarSocio');
 });
 
 // -->Pedidos
 $app->group('/pedidos',function (RouteCollectorProxy $group){
-    $group->get('[/]',\PedidoController::class . '::TraerTodos');
-    $group->get('/{id}',\PedidoController::class . '::TraerUno');
-    $group->post('[/]', \PedidoController::class . '::CargarUno');
-    $group->put('/{id}', \PedidoController::class . '::ModificarUno');
-    $group->delete('/{id}', \PedidoController::class . '::BorrarUno');
+    $group->get('[/]',\PedidoController::class . '::TraerTodos')->add(\Verificador::class . '::ValidarMozo');
+    $group->get('/{id}',\PedidoController::class . '::TraerUno')->add(\Verificador::class . '::ValidarMozo');
+    $group->post('[/]', \PedidoController::class . '::CargarUno')->add(\Verificador::class . '::ValidarMozo');
+    $group->put('/{id}', \PedidoController::class . '::ModificarUno')->add(\Verificador::class . '::ValidarMozo');
+    $group->delete('/{id}', \PedidoController::class . '::BorrarUno')->add(\Verificador::class . '::ValidarMozo');
 });
 
 $app->get('[/]', function (Request $request, Response $response) {

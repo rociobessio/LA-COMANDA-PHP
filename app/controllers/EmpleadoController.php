@@ -7,7 +7,7 @@
 
     class EmpleadoController extends Empleado implements IApiUsable{
         //-->Los roles disponibles para UN EMPLEADO son:
-        public static $roles = array("Cocinero", "Pastelero", "Cervezero", "Bartender", "Mozo", "Socio");
+        public static $roles = array("Cocinero", "Cervezero", "Bartender", "Mozo", "Socio");
 
         /**
          * Sprint 1,

@@ -13,14 +13,60 @@ luego en el navegador poner localhost:666
 
 =============================================================================
                                 PEDIDOS:
-Cuando haga un pedido deberia de chequear que no este dado de baja el proudcot
+->Cuando haga un pedido deberia de chequear que no este dado de baja el proudcot
 y que la mesa no este con estado 'BAJA'.
 
-Ver el tema de los tiempos sobre todo,
+->Ver el tema de los tiempos sobre todo, se puede manejar con middleware al hacer
+pedidos.
 
+->Cuando hago un ""borrar"" en pedido en realidad es la paga de este.
+
+->Se guarda la imagen en la tabla como FILE o la url de donde se aloja la imagen
 
 =============================================================================
-Constructores.
+                                PRODUCTO:
+-> Producto deberia de tener el tiempo estimado de preparacion?
+
+-> Luego en PEDIDOS al poner el tiempo estimado de preparacion deberia
+de verificar entre TODOS los pedidos realizados por una mesa cual es el del 
+tiempo maximo (si es mas de 1 cantidad se multiplicara) y de asi saco el estimativo
+del tiempo de preparacion para un PEDIDO. Luego al pedido se le asignara el tiempo de
+finalizacion que es al entregarse.
+
+=============================================================================
+                                MESA:
+
+Modificar los estados, cerrada es ABIERTA ->Modificar eso
+
+
+============================================================================= 
+                                GENERAL:
+
+->Cada sector ve su propio producto
+
+->Enums / Constantes sobre sectores, tipos etx.
+
+->Cocinero va al candybar, y tiene un UNICO SECTOR, 
+no hace MAS de una cosa a la vez.
+
+->2do SPRINT verficar uso middlewares y el estado de pedidos.
+
+=============================================================================
+                                MIDDLEWARE
+->Verificacion de usuarios para las distintas tareas de la COMANDA    
+
+
+->Se hace antes que  la peticion llegue a la API, se verifica que este
+en el sistema el usuario.
+
+->Validacion de inputs
+
+->Si viene campo sector, bueno FILTRO para donde va a ir.
+
+->Esta semana usar la linea sector === "sector" unicamente, luego
+si se usa JWT
+
+->Como hago para los GET porque los toma por params y no por body.
 
 
 
