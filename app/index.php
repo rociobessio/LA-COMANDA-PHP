@@ -72,6 +72,7 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->post('[/]', \PedidoController::class . '::CargarUno')->add(\Verificador::class . '::ValidarMozo');
     $group->put('/{id}', \PedidoController::class . '::ModificarUno')->add(\Verificador::class . '::ValidarMozo');
     $group->delete('/{id}', \PedidoController::class . '::BorrarUno')->add(\Verificador::class . '::ValidarMozo');
+    $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido');//->add(\Verificador::class . '::ValidarPreparador');
 });
 
 $app->get('[/]', function (Request $request, Response $response) {

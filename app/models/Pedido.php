@@ -198,4 +198,25 @@
             $consulta->execute();
         }
 
+        public static function ValidarPedido($rol){
+            $sector = "vacio";
+            switch ($rol)
+            {
+                case "Bartender":
+                    $sector = "Vinoteca";
+                    break;
+                case "Cervecero":
+                    $sector = "Cerveceria";
+                    break;
+                case "Cocinero":
+                    $sector = "Cocina";
+                    break;
+                case "Candybar"://-->Pastelero no esta certificado en el enunciado
+                    $sector = "CandyBar";
+                break;
+            }
+            return $sector;
+        
+        }
+
 }

@@ -50,6 +50,7 @@ Modificar los estados, cerrada es ABIERTA ->Modificar eso
 no hace MAS de una cosa a la vez.
 
 ->2do SPRINT verficar uso middlewares y el estado de pedidos.
+Los estados del pedido serian preparando, entregado, listo.
 
 =============================================================================
                                 MIDDLEWARE

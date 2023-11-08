@@ -26,7 +26,7 @@
                 $pedido->setIDProducto($idProducto->getIdProducto()); 
                 $pedido->setIDEmpleado(0);
                 $pedido->setTiempoEstimado(0); 
-                $pedido->setTiempoInicio(new DateTime(date("h:i:sa")));
+                $pedido->setTiempoInicio(0);
                 $pedido->setCodigoPedido(CrearCodigo(5));
                 $pedido->setCantidad($cantidad);
 
@@ -118,6 +118,53 @@
             $response->getBody()->write($payload);
             return $response
               ->withHeader('Content-Type', 'application/json');
-        
+        }
+
+        /**
+         * Me permitira iniciar un pedido ingresado por ID.
+         * 
+         * Primero se fija que exista el producto mediante su ID,
+         * luego valida el rol y que su estado sea pendiente.
+         * 
+         * Por ultimo modifica el tiempo de inicio, el tiempo estimado
+         * de preparacion y su estado.
+         * 
+         * Sprint II.
+         */
+        public static function IniciarPedido($request, $response, $args){
+            $parametros = $request->getParsedBody();
+            $idPedido = $args['id'];
+
+            $tiempoEstimadoPreparacion = new DateTime($parametros['tiempoEstimadoPreparacion']);
+            $pedido = Pedido::obtenerUno(intval($idPedido));
+            $rol = $parametros['rol'];
+            $tiempoInicio = new DateTime();
+
+            // var_dump($idPedido);
+            var_dump($pedido);
+            // var_dump($rol);
+            if($pedido){
+                // var_dump($pedido->getEstado());
+                if($pedido->getEstado() == "pendiente" &&
+                   Producto::obtenerUno($pedido->getIDProducto())->getSector() == Pedido::ValidarPedido($rol)){
+                    $pedido->setTiempoEstimado($tiempoEstimadoPreparacion->format('H:i:sa'));
+                    $pedido->setTiempoInicio($tiempoInicio->format('H:i:sa'));//-->Se asigna el tiempo de inicoi
+                    $pedido->setEstado("En preparacion");
+                    Pedido::modificar($pedido);
+                    $payload = json_encode(array("mensaje" => "Pedido iniciado correctamente!"));
+                }
+                else
+                {
+                    $payload = json_encode(array("mensaje" => "No se ha podido modificar el pedido!"));
+                }
+            
+            } else
+            {
+            $payload = json_encode(array("mensaje" => "ID no coinciden con ningun Pedido!"));
+          }
+      
+          $response->getBody()->write($payload);
+          return $response
+            ->withHeader('Content-Type', 'application/json');
         }
     }

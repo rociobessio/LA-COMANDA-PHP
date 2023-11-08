@@ -4,6 +4,28 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Psr7\Response;
 
 class Verificador {
+
+    public static function ValidarPreparador(Request $request, RequestHandler $handler) {
+        $params = $request->getParsedBody();
+        $response = new Response();
+        // $existingContent = json_decode($response->getBody());
+        echo 'en validar mozo!';
+        if(isset($params['rol'])){
+            $rol = $params['rol'];
+            if ($rol === 'mozo' || $rol === 'socio' ||$rol === 'cocinero' ||$rol === 'bartender' ||
+                $rol === 'cervecero' || $rol === 'candybar') {
+                return $handler->handle($request);
+            } 
+            else {
+                $response->getBody()->write("No puede realizar la accion NO es un preparador valido.");
+                $response = $response->withStatus(403);
+            }
+        }else
+            return json_encode(array("Mensaje" => "Se necesita el ingreso del rol"));
+
+        return $response;
+    }
+
     public static function ValidarMozo(Request $request, RequestHandler $handler) {
         $params = $request->getParsedBody();
         $response = new Response();
