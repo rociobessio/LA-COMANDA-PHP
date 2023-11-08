@@ -122,20 +122,20 @@
 //********************************************** FUNCIONES *************************************************************        
                 
         public static function crear($pedido){ 
-            $tiempoInicio = $pedido->getTiempoInicio();   
+            // $tiempoInicio = $pedido->getTiempoInicio();   
             // var_dump($pedido);
 
             $objAccesoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccesoDB->retornarConsulta("INSERT INTO pedidos 
-            (idEmpleado, idProducto, nombreCliente, estado, tiempoEstimadoPreparacion, tiempoInicio, idMesa, fotoMesa, cantidad, codigoPedido, pedidoFacturado)
-            VALUES (:idEmpleado, :idProducto, :nombreCliente, :estado, :tiempoEstimadoPreparacion, :tiempoInicio, :idMesa, :fotoMesa, :cantidad, :codigoPedido, :pedidoFacturado)");
+            (idEmpleado, idProducto, nombreCliente, estado, tiempoEstimadoPreparacion,, idMesa, fotoMesa, cantidad, codigoPedido, pedidoFacturado)
+            VALUES (:idEmpleado, :idProducto, :nombreCliente, :estado, :tiempoEstimadoPreparacion, :idMesa, :fotoMesa, :cantidad, :codigoPedido, :pedidoFacturado)");
 
             $consulta->bindValue(':idEmpleado', $pedido->getIDEmpleado(), PDO::PARAM_INT);
             $consulta->bindValue(':idProducto', $pedido->getIDProducto(), PDO::PARAM_INT);
             $consulta->bindValue(':nombreCliente', $pedido->getNombreCliente(), PDO::PARAM_STR);
             $consulta->bindValue(':estado', $pedido->getEstado(), PDO::PARAM_STR);
             $consulta->bindValue(':tiempoEstimadoPreparacion', $pedido->getTiempoEstimadoPreparacion(), PDO::PARAM_INT);
-            $consulta->bindValue(':tiempoInicio', $tiempoInicio->format('H:i:sa'));  
+            // $consulta->bindValue(':tiempoInicio', $tiempoInicio->format('H:i:sa'));  
             $consulta->bindValue(':idMesa', $pedido->getIDMesa(), PDO::PARAM_INT);
             $consulta->bindValue(':fotoMesa', $pedido->getFotoMesa());
             $consulta->bindValue(':cantidad', $pedido->getCantidad(), PDO::PARAM_INT); 

@@ -52,6 +52,8 @@ no hace MAS de una cosa a la vez.
 ->2do SPRINT verficar uso middlewares y el estado de pedidos.
 Los estados del pedido serian preparando, entregado, listo.
 
+->Cuando creo inicio un pedido debo de cambiar el estado de la mesa?
+
 =============================================================================
                                 MIDDLEWARE
 ->Verificacion de usuarios para las distintas tareas de la COMANDA    

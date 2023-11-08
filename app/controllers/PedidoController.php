@@ -6,7 +6,7 @@
     require_once "./interfaces/IApiUsable.php";
 
     class PedidoController extends Pedido implements IApiUsable{
-        public static $estadosPedido = array("pendiente", "listo para servir", "en preparacion");
+        public static $estadosPedido = array("pendiente", "listo para servir", "en preparacion","entregado");
 
         public static function CargarUno($request, $response, $args){ 
             $files = $request->getUploadedFiles();
@@ -150,12 +150,14 @@
                     $pedido->setTiempoEstimado($tiempoEstimadoPreparacion->format('H:i:sa'));
                     $pedido->setTiempoInicio($tiempoInicio->format('H:i:sa'));//-->Se asigna el tiempo de inicoi
                     $pedido->setEstado("En preparacion");
+                    //-->Mesa, con cliente esperando pedido?
+
                     Pedido::modificar($pedido);
                     $payload = json_encode(array("mensaje" => "Pedido iniciado correctamente!"));
                 }
                 else
                 {
-                    $payload = json_encode(array("mensaje" => "No se ha podido modificar el pedido!"));
+                    $payload = json_encode(array("mensaje" => "No se ha podido iniciar el pedido!"));
                 }
             
             } else
@@ -166,5 +168,80 @@
           $response->getBody()->write($payload);
           return $response
             ->withHeader('Content-Type', 'application/json');
+        }
+
+        /**
+         * Me permitira cambiarle el estado a un pedido 
+         * por el de Listo para servir.
+         * 
+         * Se fija que exista, que el estado de este sea 
+         * pendiente y valida el rol.
+         * 
+         * SPRINT II.W
+         */
+        public static function FinalizarPedido($request, $response, $args){
+            $parametros = $request->getParsedBody();
+            $idPedido = $args['id'];       
+            $pedido = Pedido::obtenerUno(intval($idPedido));
+            $rol = $parametros['rol'];
+            $tiempoFinalizacion = new DateTime();
+
+            if($pedido){
+                if($pedido->getEstado() == "En preparacion" &&
+                Producto::obtenerUno($pedido->getIDProducto())->getSector() == Pedido::ValidarPedido($rol)){
+                    $pedido->setTiempoFin($tiempoFinalizacion->format('H:i:sa'));//-->Se asigna el tiempo de finalizacion
+                    $pedido->setEstado("listo para servir");
+                    Pedido::modificar($pedido);
+                    $payload = json_encode(array("mensaje" => "Pedido ha finalizado de prepararse, ya se puede entregar!"));
+                }
+                else
+                    $payload = json_encode(array("mensaje" => "Error en querer finalizar el, es posible que no este en preparacion!"));
+            }
+            else {
+            $payload = json_encode(array("mensaje" => "ID no coinciden con ningun Pedido!"));
+          }
+          $response->getBody()->write($payload);
+          return $response
+            ->withHeader('Content-Type', 'application/json');
+        }
+
+        /**
+         * Me permitira entregar un pedido
+         *  a una mesa y cambiar sus estados.
+         * 
+         * Me fijo que exista el pedido y que su estado
+         * sea listo para servir.
+         * Cambio el estado del pedido y el estado de la
+         * mesa.
+         * 
+         * Por ultimo los modifico en sus tablas.
+         * 
+         * SPRINT II.
+         */
+        public static function EntregarPedido($request, $response, $args){
+            $parametros = $request->getParsedBody();
+            $idPedido = $args['id'];       
+            $pedido = Pedido::obtenerUno(intval($idPedido));
+            $rol = $parametros['rol'];
+
+            if($pedido){
+                if($pedido->getEstado() == "listo para servir"){
+                    $pedido->setEstado("entregado");
+                    Pedido::modificar($pedido);
+                    //-->Cambio el estado de la mesa.
+                    $mesa = Mesa::obtenerUno($pedido->getIDMesa());
+                    $mesa->setEstado("con cliente comiendo");
+                    Mesa::modificar($mesa);
+                    $payload = json_encode(array("mensaje" => "Pedido entregado al cliente!"));
+                }
+                else{$payload = json_encode(array("mensaje" => "Error en querer entregar el pedido, es posible que aun no este disponible para servirse!"));}
+            }
+            else {
+                $payload = json_encode(array("mensaje" => "ID no coinciden con ningun Pedido!"));
+            }
+
+            $response->getBody()->write($payload);
+            return $response
+              ->withHeader('Content-Type', 'application/json');
         }
     }
