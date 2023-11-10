@@ -75,6 +75,7 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido');//->add(\Verificador::class . '::ValidarPreparador');
     $group->post('/finalizar/{id}', \PedidoController::class . '::FinalizarPedido');//->add(\Verificador::class . '::ValidarPreparador');
     $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido');//->add(\Verificador::class . '::ValidarPreparador');
+    $group->post('/consultarDemoraPedido/{idMesa,idProducto}', \PedidoController::class . '::ConsultarDemoraPedido');//->add(\Verificador::class . '::ValidarPreparador');
 });
 
 $app->get('[/]', function (Request $request, Response $response) {

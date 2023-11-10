@@ -127,7 +127,7 @@
 
             $objAccesoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccesoDB->retornarConsulta("INSERT INTO pedidos 
-            (idEmpleado, idProducto, nombreCliente, estado, tiempoEstimadoPreparacion,, idMesa, fotoMesa, cantidad, codigoPedido, pedidoFacturado)
+            (idEmpleado, idProducto, nombreCliente, estado, tiempoEstimadoPreparacion, idMesa, fotoMesa, cantidad, codigoPedido, pedidoFacturado)
             VALUES (:idEmpleado, :idProducto, :nombreCliente, :estado, :tiempoEstimadoPreparacion, :idMesa, :fotoMesa, :cantidad, :codigoPedido, :pedidoFacturado)");
 
             $consulta->bindValue(':idEmpleado', $pedido->getIDEmpleado(), PDO::PARAM_INT);
@@ -216,7 +216,29 @@
                 break;
             }
             return $sector;
-        
         }
+
+        /**
+         * @param int $idMesa el id de la mesa.
+         * @param string $codigoPedido el codigo
+         * del pedido a buscar.
+         */
+        public static function ObtenerDemoraPedido($idMesa, $codigoPedido){
+            $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
+            $consulta = $objAccessoDB->retornarConsulta("
+                SELECT 
+                    p.tiempoEstimado AS demoraEstimada,
+                    p.estado AS estadoPedido,
+                    pr.nombre AS nombreProducto
+                FROM pedidos AS p
+                INNER JOIN productos AS pr ON p.idProducto = pr.idProducto
+                WHERE p.idMesa = :idMesa AND p.codigoPedido = :codigoPedido
+            ");
+            $consulta->bindValue(':idMesa', $idMesa, PDO::PARAM_INT);
+            $consulta->bindValue(':codigoPedido', $codigoPedido, PDO::PARAM_STR);
+            $consulta->execute();
+            return $consulta->fetchAll(PDO::FETCH_CLASS, 'stdClass');
+        }
+        
 
 }

@@ -7,57 +7,35 @@ php -S localhost:666 -t app
 
 luego en el navegador poner localhost:666 
 
-============================================================================
-        LA BAJA ES LOGICA => SU ESTADO PASA A BAJA NO SE ELIMINAR
-
-
+cerrar servidor ctrl + C
 =============================================================================
                                 PEDIDOS:
 ->Cuando haga un pedido deberia de chequear que no este dado de baja el proudcot
 y que la mesa no este con estado 'BAJA'.
 
-->Ver el tema de los tiempos sobre todo, se puede manejar con middleware al hacer
-pedidos.
-
 ->Cuando hago un ""borrar"" en pedido en realidad es la paga de este.
 
-->Se guarda la imagen en la tabla como FILE o la url de donde se aloja la imagen
-
 =============================================================================
-                                PRODUCTO:
--> Producto deberia de tener el tiempo estimado de preparacion?
-
+                                PRODUCTO:  
 -> Luego en PEDIDOS al poner el tiempo estimado de preparacion deberia
 de verificar entre TODOS los pedidos realizados por una mesa cual es el del 
 tiempo maximo (si es mas de 1 cantidad se multiplicara) y de asi saco el estimativo
 del tiempo de preparacion para un PEDIDO. Luego al pedido se le asignara el tiempo de
 finalizacion que es al entregarse.
 
-=============================================================================
-                                MESA:
-
-Modificar los estados, cerrada es ABIERTA ->Modificar eso
-
-
 ============================================================================= 
                                 GENERAL:
 
 ->Cada sector ve su propio producto
 
-->Enums / Constantes sobre sectores, tipos etx.
-
 ->Cocinero va al candybar, y tiene un UNICO SECTOR, 
 no hace MAS de una cosa a la vez.
-
-->2do SPRINT verficar uso middlewares y el estado de pedidos.
-Los estados del pedido serian preparando, entregado, listo.
 
 ->Cuando creo inicio un pedido debo de cambiar el estado de la mesa?
 
 =============================================================================
                                 MIDDLEWARE
 ->Verificacion de usuarios para las distintas tareas de la COMANDA    
-
 
 ->Se hace antes que  la peticion llegue a la API, se verifica que este
 en el sistema el usuario.
@@ -70,6 +48,18 @@ en el sistema el usuario.
 si se usa JWT
 
 ->Como hago para los GET porque los toma por params y no por body.
+
+=============================================================================
+                                SPRINT II:
+->Verificar si es eso lo que se refieren a cambiar estados pedidos.
+
+->Ver los middleware y su buen uso.
+
+->Seguir leyendo los requerimentos y ver que mas se puede hacer.
+
+->Si en cantidad del producto +1 se multiplica el tiempo estimado
+
+->Al iniciar un pedido se debe de asignar el ID del empleado que lo toma?
 
 
 
