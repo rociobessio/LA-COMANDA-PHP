@@ -67,14 +67,14 @@ $app->group('/empleados',function (RouteCollectorProxy $group){
 
 // -->Pedidos
 $app->group('/pedidos',function (RouteCollectorProxy $group){
-    $group->get('[/]',\PedidoController::class . '::TraerTodos')->add(\Verificador::class . '::ValidarMozo');
+    $group->get('[/]',\PedidoController::class . '::TraerTodos')->add(\Verificador::class . '::ValidarSocio');
     $group->get('/{id}',\PedidoController::class . '::TraerUno')->add(\Verificador::class . '::ValidarMozo');
     $group->post('[/]', \PedidoController::class . '::CargarUno')->add(\Verificador::class . '::ValidarMozo');
     $group->put('/{id}', \PedidoController::class . '::ModificarUno')->add(\Verificador::class . '::ValidarMozo');
     $group->delete('/{id}', \PedidoController::class . '::BorrarUno')->add(\Verificador::class . '::ValidarMozo');
-    $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido');//->add(\Verificador::class . '::ValidarPreparador');
-    $group->post('/finalizar/{id}', \PedidoController::class . '::FinalizarPedido');//->add(\Verificador::class . '::ValidarPreparador');
-    $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido');//->add(\Verificador::class . '::ValidarPreparador');
+    $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido')->add(\Verificador::class . '::ValidarPreparador');
+    $group->post('/finalizar/{id}', \PedidoController::class . '::FinalizarPedido')->add(\Verificador::class . '::ValidarPreparador');
+    $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido')->add(\Verificador::class . '::ValidarPreparador');
     $group->post('/consultarDemoraPedido/{idMesa,idProducto}', \PedidoController::class . '::ConsultarDemoraPedido');//->add(\Verificador::class . '::ValidarPreparador');
 });
 
