@@ -89,7 +89,7 @@
                 }
                 if ($pudoActualizar) {
                   Mesa::modificar($mesa);
-                  $payload = json_encode(array("mensaje" => "Mesa modificada correctamente,"));
+                  $payload = json_encode(array("mensaje" => "Mesa modificada correctamente"));
                 } else {
                   $payload = json_encode(array("mensaje" => "Se deben de ingresar todos los datos para modificar la mesa."));
                 }
@@ -102,4 +102,32 @@
             return $response
             ->withHeader('Content-Type', 'application/json');
         }
+
+        /**
+         * Me permitira cambiarle el estado a la mesa 
+         * de aquellos pedidos listos para servir
+         * a su mesa se le cambia el estado por
+         * 'con cliente comiendo'.
+         */
+        public static function CambiarEstadoMesa($request, $response, $args)
+        {
+            $parametros = $request->getParsedBody();
+            $mesa = Mesa::obtenerUno(intval($parametros['idMesa']));
+            echo 'aca';
+            $listaPedidos = Pedido::obtenerPedidosListos();
+            var_dump($listaPedidos);
+            foreach ($listaPedidos as $pedido)
+            {
+                if($pedido->getIdMesa() == $mesa->getIdMesa() && $pedido->getEstado() == "listo para servir")
+                {
+                    $mesa->setEstado( "con cliente comiendo");
+                    // var_dump($mesa);
+                    Mesa::modificar($mesa);
+                    $response->getBody()->write("Se ha modificado el estado de la mesa con exito!\n");
+                    break;
+                }
+            }
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+
     }

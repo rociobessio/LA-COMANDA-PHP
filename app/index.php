@@ -39,13 +39,14 @@ $app->addBodyParsingMiddleware();
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 //-->Mesas:
-$app->group('/mesas',function (RouteCollectorProxy $group){
+$app->group('/mesas', function (RouteCollectorProxy $group) {
     $group->get('[/]',\MesaController::class . '::TraerTodos')->add(\Verificador::class . '::ValidarSocio');
+    $group->put('/cambiarEstado', \MesaController::class . '::CambiarEstadoMesa')->add(\Verificador::class . '::ValidarMozo');
     $group->get('/{id}',\MesaController::class . '::TraerUno')->add(\Verificador::class . '::ValidarSocio');
     $group->post('[/]', \MesaController::class . '::CargarUno')->add(\Verificador::class . '::ValidarSocio');
-    $group->put('/{id}', \MesaController::class . '::ModificarUno')->add(\Verificador::class . '::ValidarSocio');
     $group->delete('/{id}', \MesaController::class . '::BorrarUno')->add(\Verificador::class . '::ValidarSocio');
 });
+
 
 //-->Productos
 $app->group('/productos',function (RouteCollectorProxy $group){
@@ -75,7 +76,8 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido')->add(\Verificador::class . '::ValidarPreparador');
     $group->post('/finalizar/{id}', \PedidoController::class . '::FinalizarPedido')->add(\Verificador::class . '::ValidarPreparador');
     $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido')->add(\Verificador::class . '::ValidarPreparador');
-    $group->post('/consultarDemoraPedido/{idMesa,idProducto}', \PedidoController::class . '::ConsultarDemoraPedido');//->add(\Verificador::class . '::ValidarPreparador');
+    $group->get('/consultarDemoraPedido/{idMesa,idProducto}', \PedidoController::class . '::ConsultarDemoraPedido');//->add(\Verificador::class . '::ValidarPreparador');
+    $group->get('/consultarPedidosPendientes/[/]', \PedidoController::class . '::ConsultarPedidosPendientes')->add(\Verificador::class . '::ValidarPreparador');
 });
 
 $app->get('[/]', function (Request $request, Response $response) {

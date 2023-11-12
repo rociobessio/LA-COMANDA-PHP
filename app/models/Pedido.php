@@ -240,5 +240,33 @@
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'stdClass');
         }
         
+        /**
+         * Listar los pedidos pendientes del tipo de empleado
+         */
+        public static function GetPedidosPendientes($rol)
+        {
+            $sector = self::ValidarPedido($rol);
 
+            $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
+            $consulta = $objAccessoDB->retornarConsulta("SELECT pedidos.*
+            FROM pedidos
+            INNER JOIN productos ON pedidos.idProducto = productos.idProducto
+            WHERE pedidos.estado = :estado AND productos.sector = :sector");
+            $consulta->bindValue(':estado', "pendiente");
+            $consulta->bindValue(':sector', $sector );
+            $consulta->execute();
+            return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+        }
+
+        /**
+         * Me permitira traerme todos los pedidos
+         * cuyo estado sea igual a 'listo para servir'
+         */
+        public static function obtenerPedidosListos(){
+            $objAccesoDatos = AccesoDatos::obtenerObjetoAcceso();
+            $consulta = $objAccesoDatos->retornarConsulta("SELECT * FROM pedidos WHERE estado = :estado");
+            $consulta->bindValue(':estado', "listo para servir");
+            $consulta->execute();
+            return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+        }
 }

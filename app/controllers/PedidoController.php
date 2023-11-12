@@ -147,7 +147,7 @@
                 $pedido->setTiempoEstimado($tiempoEstimadoPreparacion->format('H:i:sa'));
         
                 $pedido->setTiempoInicio($tiempoInicio->format('H:i:sa'));
-                $pedido->setEstado("En preparación");
+                $pedido->setEstado("En preparacion");
         
                 //-->Mesa, con cliente esperando pedido?
                 Pedido::modificar($pedido);
@@ -177,6 +177,7 @@
             $tiempoFinalizacion = new DateTime();
 
             if($pedido){
+                var_dump($pedido);
                 if($pedido->getEstado() == "En preparacion" &&
                 Producto::obtenerUno($pedido->getIDProducto())->getSector() == Pedido::ValidarPedido($rol)){
                     $pedido->setTiempoFin($tiempoFinalizacion->format('H:i:sa'));//-->Se asigna el tiempo de finalizacion
@@ -218,10 +219,6 @@
                 if($pedido->getEstado() == "listo para servir"){
                     $pedido->setEstado("entregado");
                     Pedido::modificar($pedido);
-                    //-->Cambio el estado de la mesa.
-                    $mesa = Mesa::obtenerUno($pedido->getIDMesa());
-                    $mesa->setEstado("con cliente comiendo");
-                    Mesa::modificar($mesa);
                     $payload = json_encode(array("mensaje" => "Pedido entregado al cliente!"));
                 }
                 else{$payload = json_encode(array("mensaje" => "Error en querer entregar el pedido, es posible que aun no este disponible para servirse!"));}
@@ -258,4 +255,29 @@
             return $response->withHeader('Content-Type', 'application/json');
         }
         
+        /**
+         * Me permitira consultar los pedidos listos por el rol/sector
+         * del empleado.
+         */
+        public static function ConsultarPedidosPendientes($request, $response, $args)
+        {
+            $rol = isset($parametros['rol']) ? $parametros['rol'] : null;
+
+            if($rol !== null){
+                $lista = Pedido::GetPedidosPendientes($rol);
+                if(count($lista) > 0)
+                {
+                    $payload = json_encode(array("Pedidos" => $lista));
+                    $response->getBody()->write($payload);
+                }
+                else
+                {
+                    $response->getBody()->write("No se encontraron pedidos pendientes.");
+                }
+            }
+
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+
+
     }

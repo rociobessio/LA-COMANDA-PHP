@@ -93,8 +93,6 @@
          * @param Mesa $mesa el obj de tipo Mesa
          */
         public static function modificar($mesa){
-            // var_dump($mesa->getEstado());
-            // var_dump($mesa->getIdMesa());
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccessoDB->retornarConsulta("UPDATE mesas SET estado = :estado WHERE idMesa = :id");
             $consulta->bindValue(':id', $mesa->getIdMesa(), PDO::PARAM_INT);

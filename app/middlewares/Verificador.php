@@ -7,7 +7,7 @@ class Verificador {
 
     public static function ValidarPreparador(Request $request, RequestHandler $handler) {
         $params = $request->getParsedBody();
-        // $parametros = $request->getQueryParams();//-->Para get
+        // $params = $request->getQueryParams();//-->Para getk
         $response = new Response();
         
         echo 'en validar PREPARADOR DE PEDIDO!';
@@ -30,21 +30,20 @@ class Verificador {
     public static function ValidarMozo(Request $request, RequestHandler $handler) {
         // $parametros = $request->getQueryParams();
         // $existingContent = json_decode($response->getBody());
-        $parametros = $request->getParsedBody();//-->Para POST
+        $parametros = $request->getQueryParams();
         echo 'en validar mozo!';
-        if (isset($parametros['rol'])) { 
+        if (isset($parametros['rol'])) {
             $rol = $parametros['rol'];
             if ($rol === 'mozo') {
                 return $handler->handle($request);
-            } 
-            else {
+            } else {
                 $response = new Response();
-                $payload = json_encode(array('mensaje' => 'No sos MOZO no podes realizar la acción'));
+                $payload = json_encode(array('mensaje' => 'No sos mozo no podes realizar la accion'));
                 $response->getBody()->write($payload);
                 return $response->withHeader('Content-Type', 'application/json');
             }
         } else {
-            return json_encode(array("Mensaje" => "Se necesita el ingreso del rol"));
+            return $handler->handle($request);
         }
     }
 
