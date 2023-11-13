@@ -70,6 +70,7 @@ $app->group('/empleados',function (RouteCollectorProxy $group){
 
 // -->Pedidos
 $app->group('/pedidos',function (RouteCollectorProxy $group){
+    $group->get('/consultarDemoraPedido/{idMesa,codPedido}', \PedidoController::class . '::ConsultarDemoraPedido');//->add(new MWPreparador());
     $group->get('[/]',\PedidoController::class . '::TraerTodos')->add(new MWSocios());
     $group->get('/{id}',\PedidoController::class . '::TraerUno')->add(new MWMozos());
     $group->post('[/]', \PedidoController::class . '::CargarUno')->add(new MWMozos());
@@ -78,7 +79,6 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido')->add(new MWPreparador());
     $group->post('/finalizar/{id}', \PedidoController::class . '::FinalizarPedido')->add(new MWPreparador());
     $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido')->add(new MWPreparador());
-    $group->get('/consultarDemoraPedido/{idMesa,idProducto}', \PedidoController::class . '::ConsultarDemoraPedido')->add(new MWPreparador());
     $group->get('/consultarPedidosPendientes/[/]', \PedidoController::class . '::ConsultarPedidosPendientes')->add(new MWPreparador());
 });
 

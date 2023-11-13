@@ -237,11 +237,11 @@
          *  demora de su pedido.
          */
         public static function ConsultarDemoraPedido($request,$response,$args){
-            $parametros = $request->getParsedBody();
+            $parametros = $request->getQueryParams();
             
             if(isset($parametros['idMesa']) && isset($parametros['idPedido'])){
                 $idMesa = intval($parametros['idMesa']);
-                $codigoPedido = $parametros['idPedido'];
+                $codigoPedido = $parametros['codPedido'];//-->Es el alfanumerico
                 $listaPedidos = Pedido::ObtenerDemoraPedido($idMesa,$codigoPedido);
                 if(count($listaPedidos) > 0){
                     $payload = json_encode(array("Pedidos" => $listaPedidos));
@@ -261,23 +261,22 @@
          */
         public static function ConsultarPedidosPendientes($request, $response, $args)
         {
+            $parametros = $request->getQueryParams();//-->Directamente del que ingreso 
             $rol = isset($parametros['rol']) ? $parametros['rol'] : null;
-
-            if($rol !== null){
+            var_dump($rol);
+            if ($rol !== null) {
                 $lista = Pedido::GetPedidosPendientes($rol);
-                if(count($lista) > 0)
-                {
+                if (count($lista) > 0) {
                     $payload = json_encode(array("Pedidos" => $lista));
                     $response->getBody()->write($payload);
-                }
-                else
-                {
+                } else {
                     $response->getBody()->write("No se encontraron pedidos pendientes.");
                 }
             }
 
             return $response->withHeader('Content-Type', 'application/json');
         }
+
 
 
     }
