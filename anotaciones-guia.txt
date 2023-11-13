@@ -62,6 +62,23 @@ si se usa JWT
 ->Al iniciar un pedido se debe de asignar el ID del empleado que lo toma?
 
 
+===============================================================================
+DE CORRECCIONES QUEDA HACER:
+Cada empleado responsable de cada producto del pedido , debe:
+❏ Listar todos los productos pendientes de este tipo de empleado.
+
+❏ El cliente ingresa el código de la mesa junto con el número de pedido y ve el tiempo de
+demora de su pedido.
+❏ 5- Alguno de los socios pide el listado de pedidos y el tiempo de demora de ese pedido.
+❏ 6- Cada empleado responsable de cada producto del pedido, debe:
+❏ Listar todos los productos pendientes de este tipo de empleado
+
+❏ La moza cobra la cuenta.
+❏ 10- Alguno de los socios cierra la mesa.
+❏ 11- El cliente ingresa el código de mesa y el del pedido junto con los datos de la encuesta.
+❏ 12- Alguno de los socios pide los mejores comentarios
+❏ 13- Alguno de los socios pide la mesa más usada.
+
 
 
  

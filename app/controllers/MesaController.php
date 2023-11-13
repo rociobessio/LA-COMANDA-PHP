@@ -108,6 +108,8 @@
          * de aquellos pedidos listos para servir
          * a su mesa se le cambia el estado por
          * 'con cliente comiendo'.
+         * 
+         * La moza se fija los pedidos que están listos para servir , cambia el estado de la mesa,
          */
         public static function CambiarEstadoMesa($request, $response, $args)
         {
