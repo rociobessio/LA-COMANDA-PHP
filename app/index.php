@@ -58,6 +58,8 @@ $app->group('/productos',function (RouteCollectorProxy $group){
 // -->Empleados
 $app->group('/empleados',function (RouteCollectorProxy $group){
     $group->get('[/]',\EmpleadoController::class . '::TraerTodos')->add(new MWSocios());
+    $group->get('/exportarCSV', \EmpleadoController::class . '::ExportarEmpleados')->add(new MWSocios());
+    $group->post('/importarCSV', \EmpleadoController::class . '::ImportarEmpleados')->add(new MWSocios())->add(\CSV::class . '::ValidarArchivo');
     $group->get('/{id}',\EmpleadoController::class . '::TraerUno')->add(new MWSocios());
     $group->post('[/]', \EmpleadoController::class . '::CargarUno')->add(new MWSocios());
     $group->put('/{id}', \EmpleadoController::class . '::ModificarUno')->add(new MWSocios());

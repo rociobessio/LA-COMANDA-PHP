@@ -1,9 +1,10 @@
 <?php
 
     include_once "./models/empleado.php";
+    include_once "./models/CSV.php";
     // require_once "./models/Empleado.php";
     require_once "./interfaces/IApiUsable.php";
-    require_once "./middlewares/AutentificadorJWT2.php";
+    require_once "./middlewares/AutentificadorJWT.php";
 
 
     class EmpleadoController extends Empleado implements IApiUsable{
@@ -99,6 +100,7 @@
             return $response->withHeader('Content-Type', 'application/json');
         }
 
+//======================================== SPRINT III ===============================================================
         /**
          * Me permitira loguear un usuario y asignarle un 
          * token.
@@ -119,5 +121,42 @@
             $response->getBody()->write($payload);
             return $response
             ->withHeader('Content-Type', 'application/json');
+        }
+
+        /**
+         * Me permtira exportar la lista de empleados.
+         */
+        public static function ExportarEmpleados($request,$response,$args){
+            try{
+                $archivo = CSV::ExportarCSV("empleados.csv");
+                if(file_exists($archivo) && filesize($archivo) > 0){
+                    $payload = json_encode(array("Archivo creado" => $archivo));
+                }
+                else{
+                    $payload = json_encode(array("Error" => "Datos ingresados invalidos."));
+                }
+                $response->getBody()->write($payload);
+            }
+            catch (Exception $e){
+                echo $e;
+            }
+            finally{
+                return $response->withHeader('Content-Type', 'text/csv');
+            }
+        }
+
+        public static function ImportarEmpleados($request,$response,$args){
+            try{
+                $archivo = ($_FILES["file"]);
+                Empleado::CargarCSV($archivo["tmp_name"]);
+                $payload = json_encode(array("Mensaje" => "Empleados cargados!"));
+            }
+            catch(Throwable $e){
+                $payload = json_encode(array("Error" => $e->getMessage()));
+            }
+            finally{
+                $response->getBody()->write($payload);
+                return $response->withHeader('Content-Type', 'text/csv');
+            }
         }
     }

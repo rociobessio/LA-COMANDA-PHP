@@ -15,8 +15,8 @@ class MWSocios{
         try
         {
             $data = AutentificadorJWT::ObtenerData($token);
-            var_dump($data);
-            var_dump($data->rol == "Socio");
+            // var_dump($data);
+            // var_dump($data->rol == "Socio");
             if($data->rol == "Socio")
             {
                 $response= $handler->handle($request);

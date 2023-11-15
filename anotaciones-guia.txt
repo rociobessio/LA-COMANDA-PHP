@@ -30,6 +30,9 @@ tiempo maximo (si es mas de 1 cantidad se multiplicara) y de asi saco el estimat
 del tiempo de preparacion para un PEDIDO. Luego al pedido se le asignara el tiempo de
 finalizacion que es al entregarse.
 
+->Producto debreia de tener tambien el tipo estimado de preparacion para
+luego calcular entre todos los productos de un mismo pedido se calcule el de
+mayor tiempo d preparacion 
 ============================================================================= 
                                 GENERAL:
 
@@ -38,7 +41,6 @@ finalizacion que es al entregarse.
 ->Cocinero va al candybar, y tiene un UNICO SECTOR, 
 no hace MAS de una cosa a la vez.
 
-->Cuando creo inicio un pedido debo de cambiar el estado de la mesa?
 
 =============================================================================
                                 MIDDLEWARE

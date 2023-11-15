@@ -13,8 +13,8 @@ class MWMozos{
         try
         {
             $data = AutentificadorJWT::ObtenerData($token);
-            var_dump($data);
-            var_dump($data->rol == "Mozo");
+            // var_dump($data);
+            // var_dump($data->rol == "Mozo");
             if($data->rol == "Mozo")
             {
                 $response= $handler->handle($request);

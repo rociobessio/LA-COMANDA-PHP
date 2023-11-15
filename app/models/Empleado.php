@@ -45,6 +45,21 @@
                 $this->clave = $clave;
             }
         }
+        public function setIdEmpleado($id){
+            if(isset($id) && is_int($id)){
+                $this->idEmpleado = $id;
+            }
+        }
+        public function setfechaAlta($fechaAlta){
+            if(isset($fechaAlta)){
+                $this->fechaAlta = $fechaAlta;
+            }
+        }
+        public function setfechaBaja($fechaBaja){
+            if(isset($fechaBaja)){
+                $this->fechaBaja = $fechaBaja;
+            }
+        }
 //********************************************** FUNCIONES *************************************************************
         /**
          * Me permitira guardar una instancia de 
@@ -130,5 +145,24 @@
             $consulta->bindValue(':id', $id, PDO::PARAM_INT);
             $consulta->bindValue(':fechabaja',date_format($fechaBaja, 'Y-m-d'));
             return $consulta->execute();
+        }
+
+        /**
+         * Me permtira cargar un archivo CSV,
+         * SPRINT III
+         */
+        public static function CargarCSV($path){
+            $array = CSV::ImportarCSV($path);
+            for ($i=0; $i < sizeof($array) ; $i++) { 
+                $data = explode(",",$array[$i]);
+                $empleado = new Empleado();
+                $empleado->setIdEmpleado($data[0]);
+                $empleado->setRol($data[1]);
+                $empleado->setNombre($data[2]);
+                $empleado->setfechaAlta($data[3]);
+                $empleado->setfechaBaja($data[4]);
+                $empleado->setClave($data[5]);
+                Empleado::crear($empleado);//-->Guardo en la db
+            }
         }
     }

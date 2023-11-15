@@ -13,7 +13,7 @@ class MWToken{
 
         try
         {   //-->Verifico el token.
-            echo 'todo ok en token';
+            // echo 'todo ok en token';
             json_encode(array("Token" => AutentificadorJWT::VerificarToken($token)));
             $response = $handler->handle($request);
         }
