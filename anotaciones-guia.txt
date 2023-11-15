@@ -8,12 +8,19 @@ php -S localhost:666 -t app
 luego en el navegador poner localhost:666 
 
 cerrar servidor ctrl + C
+
+->Para JWT en el composer.json poner: "firebase/php-jwt": "^4.0"
+Luego tirar en la raiz del proyecto composer update
+
 =============================================================================
                                 PEDIDOS:
 ->Cuando haga un pedido deberia de chequear que no este dado de baja el proudcot
 y que la mesa no este con estado 'BAJA'.
 
 ->Cuando hago un ""borrar"" en pedido en realidad es la paga de este.
+
+->Cambiar pedidos tiene los productos. No hay pedido - idProducto.
+Pedidos tiene que tener los productos,
 
 =============================================================================
                                 PRODUCTO:  
@@ -50,18 +57,35 @@ si se usa JWT
 ->Como hago para los GET porque los toma por params y no por body.
 
 =============================================================================
+                                    JWT:
+->JSON web TOKEn. 
+
+->Dentro del header de la app el token valida el usuario
+
+->Trae info importante como la hora de registro
+
+->Clave para empleados se debe d agregar
+
+->Ademas tengo que crear lo de administrador.
+
+AUTENTIFICADOR JWT:
+composer require firebase/php-jwt
+=============================================================================
                                 SPRINT II:
-->Verificar si es eso lo que se refieren a cambiar estados pedidos.
-
-->Ver los middleware y su buen uso.
-
-->Seguir leyendo los requerimentos y ver que mas se puede hacer.
 
 ->Si en cantidad del producto +1 se multiplica el tiempo estimado
 
 ->Al iniciar un pedido se debe de asignar el ID del empleado que lo toma?
 
+=============================================================================
+                                SPRINT III:
+->Autificacion JWT.
 
+->Manejo archivos .csv
+
+->En empleado poner una clave, modificar su clase y alta.
+
+->Para csv se toma cualquier entidad y se hace el registro y descarga
 ===============================================================================
 DE CORRECCIONES QUEDA HACER:
 Cada empleado responsable de cada producto del pedido , debe:
@@ -78,6 +102,10 @@ demora de su pedido.
 ❏ 11- El cliente ingresa el código de mesa y el del pedido junto con los datos de la encuesta.
 ❏ 12- Alguno de los socios pide los mejores comentarios
 ❏ 13- Alguno de los socios pide la mesa más usada.
+
+================================================================================
+                                    CORRECCIONES:
+-> El metodo ConsultarDemoraPedido en PedidoController.php no funciona.
 
 
 

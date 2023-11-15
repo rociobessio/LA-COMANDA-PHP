@@ -10,12 +10,13 @@ use Slim\Routing\RouteCollectorProxy;
 use Slim\Routing\RouteContext;
 use Slim\Cookie\Cookie;
 
-
 require __DIR__ . '/../vendor/autoload.php';
 
 require_once "./middlewares/MWSocios.php"; 
 require_once "./middlewares/MWMozos.php"; 
 require_once "./middlewares/MWPreparador.php"; 
+require_once "./middlewares/MWToken.php"; 
+require_once "./middlewares/Logger.php";
 
 require_once './db/accesoDB.php'; 
 require_once './controllers/PedidoController.php';
@@ -25,7 +26,6 @@ require_once "./controllers/MesaController.php";
 
 date_default_timezone_set('America/Argentina/Buenos_Aires');
 
-//-->No funciona el dotenv
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
 
@@ -33,9 +33,6 @@ $dotenv->safeLoad();
 // Instantiate App
 $app = AppFactory::create();
 
-// $app->setBasePath('/Comanda');
-// echo 'aaaa';
-// $app->addRoutingMiddleware();
 $app->addBodyParsingMiddleware();
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
@@ -43,12 +40,11 @@ $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 //-->Mesas:
 $app->group('/mesas', function (RouteCollectorProxy $group) {
     $group->get('[/]',\MesaController::class . '::TraerTodos')->add(new MWSocios());
-    $group->put('/cambiarEstado', \MesaController::class . '::CambiarEstadoMesa')->add(\Verificador::class . '::ValidarMozo');
+    $group->put('/cambiarEstado', \MesaController::class . '::CambiarEstadoMesa')->add(new MWMozos());
     $group->get('/{id}',\MesaController::class . '::TraerUno')->add(new MWSocios());
     $group->post('[/]', \MesaController::class . '::CargarUno')->add(new MWSocios());
     $group->delete('/{id}', \MesaController::class . '::BorrarUno')->add(new MWSocios());
-});
-
+})->add(new MWToken());
 
 //-->Productos
 $app->group('/productos',function (RouteCollectorProxy $group){
@@ -57,7 +53,7 @@ $app->group('/productos',function (RouteCollectorProxy $group){
     $group->post('[/]', \ProductoController::class . '::CargarUno')->add(new MWSocios());
     $group->put('/{id}', \ProductoController::class . '::ModificarUno')->add(new MWSocios());
     $group->delete('/{id}', \ProductoController::class . '::BorrarUno')->add(new MWSocios());
-});
+})->add(new MWToken());
 
 // -->Empleados
 $app->group('/empleados',function (RouteCollectorProxy $group){
@@ -66,7 +62,7 @@ $app->group('/empleados',function (RouteCollectorProxy $group){
     $group->post('[/]', \EmpleadoController::class . '::CargarUno')->add(new MWSocios());
     $group->put('/{id}', \EmpleadoController::class . '::ModificarUno')->add(new MWSocios());
     $group->delete('/{id}', \EmpleadoController::class . '::BorrarUno')->add(new MWSocios());
-});
+})->add(new MWToken());
 
 // -->Pedidos
 $app->group('/pedidos',function (RouteCollectorProxy $group){
@@ -80,12 +76,18 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->post('/finalizar/{id}', \PedidoController::class . '::FinalizarPedido')->add(new MWPreparador());
     $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido')->add(new MWPreparador());
     $group->get('/consultarPedidosPendientes/[/]', \PedidoController::class . '::ConsultarPedidosPendientes')->add(new MWPreparador());
+})->add(new MWToken());
+
+//-->Login para conseguir token
+$app->group('/login', function (RouteCollectorProxy $group) {
+    $group->post('[/]', \EmpleadoController::class . '::LoguearEmpleado')->add(\Logger::class . '::ValidarEmpleado');
 });
+  
 
 $app->get('[/]', function (Request $request, Response $response) {
     $payload = json_encode(array("TP" => "Comanda"));
     $response->getBody()->write($payload);
     return $response->withHeader('Content-Type', 'application/json');
-  });
+});
   
 $app->run();

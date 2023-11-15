@@ -216,9 +216,16 @@
             $rol = $parametros['rol'];
 
             if($pedido){
+                $mesa = Mesa::obtenerUno($pedido->getIdMesa());
                 if($pedido->getEstado() == "listo para servir"){
                     $pedido->setEstado("entregado");
                     Pedido::modificar($pedido);
+
+                    //-->Modifico el estado de la mesa.
+                    if($mesa->getEstado() == "con cliente esperando pedido"){
+                        $mesa->setEstado("con cliente comiendo");
+                        Mesa::modificar($mesa);
+                    }
                     $payload = json_encode(array("mensaje" => "Pedido entregado al cliente!"));
                 }
                 else{$payload = json_encode(array("mensaje" => "Error en querer entregar el pedido, es posible que aun no este disponible para servirse!"));}

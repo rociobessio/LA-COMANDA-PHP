@@ -9,6 +9,7 @@
         public $nombre;
         public $fechaAlta;
         public $fechaBaja;
+        public $clave;
 //********************************************** GETTERS *************************************************************
         public function getNombre(){
             return $this->nombre;
@@ -25,6 +26,9 @@
         public function getIDEmpleado(){
             return $this->idEmpleado;
         }
+        public function getClave(){
+            return $this->clave;
+        }
 //********************************************** SETTERS *************************************************************
         public function setNombre($nombre){
             if(isset($nombre) && !empty($nombre)){
@@ -34,6 +38,11 @@
         public function setRol($rol){
             if(isset($rol) && !empty($rol)){
                 $this->rol = $rol;
+            }
+        }
+        public function setClave($clave){
+            if(isset($clave) && !empty($clave)){
+                $this->clave = $clave;
             }
         }
 //********************************************** FUNCIONES *************************************************************
@@ -46,11 +55,12 @@
             $fechaAlta = new DateTime(date("d-m-Y"));//-->Le asigno la fecha de alta
             $fechaBaja = null; //-->Si se crea no se asigna la baja
             $objAccesoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccesoDB->retornarConsulta("INSERT INTO empleados (rol, nombre, fechaAlta, fechaBaja) VALUES (:rol, :nombre, :fechaAlta, :fechaBaja)");
+            $consulta = $objAccesoDB->retornarConsulta("INSERT INTO empleados (rol, nombre, fechaAlta, fechaBaja,clave) VALUES (:rol, :nombre, :fechaAlta, :fechaBaja,:clave)");
             $consulta->bindValue(':rol', $empleado->getRol(), PDO::PARAM_STR);
             $consulta->bindValue(':nombre', $empleado->getNombre(), PDO::PARAM_STR);
             $consulta->bindValue(':fechaAlta', date_format($fechaAlta, "Y-m-d"), PDO::PARAM_STR);
             $consulta->bindValue(':fechaBaja', $fechaBaja, PDO::PARAM_STR);
+            $consulta->bindValue(':clave', $empleado->getClave(), PDO::PARAM_STR);
             $consulta->execute();
             return $objAccesoDB->retornarUltimoInsertado();
         }
@@ -61,10 +71,21 @@
          */
         public static function obtenerTodos(){
             $objAccesoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccesoDB->retornarConsulta("SELECT idEmpleado,rol,nombre,fechaAlta,fechaBaja FROM empleados");
+            $consulta = $objAccesoDB->retornarConsulta("SELECT idEmpleado,rol,nombre,fechaAlta,fechaBaja,clave FROM empleados");
             $consulta->execute();
 
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'Empleado');
+        }
+
+        
+        public static function obtenerUnoPorUsuario($nombre,$clave){
+            $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
+            $consulta = $objAccessoDB->retornarConsulta("SELECT idEmpleado,rol,nombre,clave FROM empleados WHERE nombre = :nombre AND clave = :clave");
+            $consulta->bindValue(':nombre', $nombre, PDO::PARAM_STR);
+            $consulta->bindValue(':clave', $clave, PDO::PARAM_STR);
+            $consulta->execute();
+
+            return $consulta->fetchObject('Empleado');
         }
 
         /**
@@ -74,7 +95,7 @@
          */
         public static function obtenerUno($valor){
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccessoDB->retornarConsulta("SELECT idEmpleado,rol,nombre,fechaAlta,fechaBaja FROM empleados WHERE idEmpleado = :valor");
+            $consulta = $objAccessoDB->retornarConsulta("SELECT idEmpleado,rol,nombre,fechaAlta,fechaBaja,clave FROM empleados WHERE idEmpleado = :valor");
             $consulta->bindValue(':valor', $valor, PDO::PARAM_INT);
             $consulta->execute();
 
@@ -87,10 +108,11 @@
          */
         public static function modificar($empleado){
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccessoDB->retornarConsulta("UPDATE empleados SET nombre = :nombre, rol = :rol WHERE idEmpleado = :id");
+            $consulta = $objAccessoDB->retornarConsulta("UPDATE empleados SET nombre = :nombre, rol = :rol, clave = :clave WHERE idEmpleado = :id");
             $consulta->bindValue(':id', $empleado->getIDEmpleado(), PDO::PARAM_INT);
             $consulta->bindValue(':nombre', $empleado->getNombre(), PDO::PARAM_STR);
             $consulta->bindValue(':rol', $empleado->getRol(), PDO::PARAM_STR);
+            $consulta->bindValue(':rol', $empleado->getClave(), PDO::PARAM_STR);
             // $consulta->bindValue(':fechaAlta', $empleado->getFechaAlta(), PDO::PARAM_INT);
             // $consulta->bindValue(':fechaBaja', $empleado->getFechaBaja(), PDO::PARAM_STR);
             return $consulta->execute();

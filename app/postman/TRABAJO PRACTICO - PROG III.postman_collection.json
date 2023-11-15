@@ -8,11 +8,31 @@
 	"item": [
 		{
 			"name": "LISTAR",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
 				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "rol",
+							"value": "socio",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "rol",
+							"value": "socio",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
 				"url": {
-					"raw": "http://localhost:666/pedidos",
+					"raw": "http://localhost:666/pedidos?rol=socio",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -20,6 +40,12 @@
 					"port": "666",
 					"path": [
 						"pedidos"
+					],
+					"query": [
+						{
+							"key": "rol",
+							"value": "socio"
+						}
 					]
 				}
 			},
@@ -138,7 +164,7 @@
 					"formdata": [
 						{
 							"key": "nombre",
-							"value": "Fanta",
+							"value": "Pepsi",
 							"type": "text",
 							"disabled": true
 						},
@@ -150,7 +176,7 @@
 						},
 						{
 							"key": "precio",
-							"value": "800",
+							"value": "1200",
 							"type": "text",
 							"disabled": true
 						},
@@ -162,19 +188,13 @@
 						},
 						{
 							"key": "nombre",
-							"value": "Romina",
-							"type": "text",
-							"disabled": true
-						},
-						{
-							"key": "rol",
-							"value": "Socio",
+							"value": "Hernan",
 							"type": "text",
 							"disabled": true
 						},
 						{
 							"key": "idProducto",
-							"value": "12",
+							"value": "6",
 							"type": "text"
 						},
 						{
@@ -184,23 +204,35 @@
 						},
 						{
 							"key": "idMesa",
-							"value": "5",
+							"value": "9",
 							"type": "text"
 						},
 						{
 							"key": "fotoMesa",
 							"type": "file",
-							"src": "/C:/Users/Rocio/Downloads/family_smiling_dinner.webp"
+							"src": "/C:/Users/Rocio/Downloads/615efe4fc2a4ca001875ff3f.webp"
 						},
 						{
 							"key": "nombreCliente",
-							"value": "Estela Ramirez",
+							"value": "Juliana",
 							"type": "text"
+						},
+						{
+							"key": "estado",
+							"value": "cerrada",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "rol",
+							"value": "mozo",
+							"type": "text",
+							"disabled": true
 						}
 					]
 				},
 				"url": {
-					"raw": "http://localhost:666/pedidos/",
+					"raw": "http://localhost:666/pedidos/?rol=mozo",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -209,6 +241,12 @@
 					"path": [
 						"pedidos",
 						""
+					],
+					"query": [
+						{
+							"key": "rol",
+							"value": "mozo"
+						}
 					]
 				}
 			},
@@ -227,7 +265,48 @@
 					"formdata": []
 				},
 				"url": {
-					"raw": "http://localhost:666/pedidos/4",
+					"raw": "http://localhost:666/empleados/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"empleados",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "INICIAR PEDIDO",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "rol",
+							"value": "Cocinero",
+							"type": "text"
+						},
+						{
+							"key": "tiempoEstimadoPreparacion",
+							"value": "00:15:00",
+							"type": "text"
+						},
+						{
+							"key": "idPedido",
+							"value": "4",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:666/pedidos/iniciar/14",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -235,7 +314,187 @@
 					"port": "666",
 					"path": [
 						"pedidos",
-						"4"
+						"iniciar",
+						"14"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FINALIZAR PEDIDO",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "rol",
+							"value": "Cocinero",
+							"type": "text"
+						},
+						{
+							"key": "rol",
+							"value": "Candybar",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:666/pedidos/finalizar/14",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"pedidos",
+						"finalizar",
+						"14"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ENTREGAR PEDIDO",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "rol",
+							"value": "Cocinero",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:666/pedidos/entregar/14",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"pedidos",
+						"entregar",
+						"14"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LISTAR PEDIDOS PENDIENTES",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:666/pedidos/consultarPedidosPendientes/?rol=Cocinero",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"pedidos",
+						"consultarPedidosPendientes",
+						""
+					],
+					"query": [
+						{
+							"key": "rol",
+							"value": "Cocinero"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CAMBIAR ESTADO MESA",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "idMesa",
+							"value": "10",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:666/mesas/cambiarEstado",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"mesas",
+						"cambiarEstado"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CONSULTAR DEMORA PEDIDO",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "idMesa",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "codPedido",
+							"value": "3QVRa",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:666/pedidos/consultarDemoraPedido/3/3QVRa",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "666",
+					"path": [
+						"pedidos",
+						"consultarDemoraPedido",
+						"3",
+						"3QVRa"
+					],
+					"query": [
+						{
+							"key": "rol",
+							"value": "Cocinero",
+							"disabled": true
+						}
 					]
 				}
 			},

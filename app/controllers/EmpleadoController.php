@@ -3,6 +3,7 @@
     include_once "./models/empleado.php";
     // require_once "./models/Empleado.php";
     require_once "./interfaces/IApiUsable.php";
+    require_once "./middlewares/AutentificadorJWT2.php";
 
 
     class EmpleadoController extends Empleado implements IApiUsable{
@@ -17,12 +18,14 @@
             $parametros = $request->getParsedBody();
             $nombre = $parametros['nombre'];
             $rol = $parametros['rol'];
+            $clave = $parametros['clave'];
             var_dump($rol);
             
             if(in_array($rol,self::$roles)){
                 $empleado = new Empleado();
                 $empleado->setNombre($nombre);
                 $empleado->setRol($rol);
+                $empleado->setClave($clave);
                 Empleado::crear($empleado);    
                 $payload = json_encode(array("Mensaje" => "El empleado se ha cargado correctamente!"));
             }
@@ -75,10 +78,11 @@
             if($empleado !== false){
                 $parametros = $request->getParsedBody();
 
-                if(isset($parametros['nombre']) && isset($parametros['rol'])){
+                if(isset($parametros['nombre']) && isset($parametros['rol']) && isset($parametros['clave'])){
                         if(in_array($parametros['rol'],self::$roles)){
                             $empleado->setNombre($parametros['nombre']);
                             $empleado->setRol($parametros['rol']);
+                            $empleado->setClave($parametros['clave']);
                             Empleado::modificar($empleado);
                             $payload = json_encode(array("mensaje" => "El empleado se ha podido modificar correctamente!"));
                         }
@@ -93,5 +97,27 @@
 
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
+        }
+
+        /**
+         * Me permitira loguear un usuario y asignarle un 
+         * token.
+         */
+        public static function LoguearEmpleado($request,$response,$args){
+            $parametros = $request->getParsedBody();
+            $nombre = $parametros['nombre'];
+            $clave = $parametros['clave'];
+
+            $empleado = Empleado::obtenerUnoPorUsuario($nombre,$clave);
+            $data = array('empleado' => $empleado->getNombre(), 'rol' => $empleado->getRol(), 'clave' => $empleado->getClave());
+            $creacionToken = AutentificadorJWT::CrearToken($data);
+
+            $response = $response->withHeader('Set-Cookie', 'token=' . $creacionToken['jwt']);
+
+            $payload = json_encode(array("mensaje" => "Usuario logueado correctamente", "token" => $creacionToken['jwt']));
+
+            $response->getBody()->write($payload);
+            return $response
+            ->withHeader('Content-Type', 'application/json');
         }
     }
