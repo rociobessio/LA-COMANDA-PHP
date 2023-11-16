@@ -80,12 +80,13 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->get('/consultarPedidosPendientes/[/]', \PedidoController::class . '::ConsultarPedidosPendientes')->add(new MWPreparador());
 })->add(new MWToken());
 
+//-->Tabla intermedia Pedido-Producto
+
 //-->Login para conseguir token
 $app->group('/login', function (RouteCollectorProxy $group) {
     $group->post('[/]', \EmpleadoController::class . '::LoguearEmpleado')->add(\Logger::class . '::ValidarEmpleado');
 });
   
-
 $app->get('[/]', function (Request $request, Response $response) {
     $payload = json_encode(array("TP" => "Comanda"));
     $response->getBody()->write($payload);

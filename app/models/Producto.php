@@ -9,6 +9,8 @@
         public $sector;
         public $precio;
         public $tipo;
+        //-->tiempo 
+        public $tiempoEstimadoProducto;
 //********************************************** GETTERS *************************************************************
         public function getNombre(){
             return $this->nombre;
@@ -24,6 +26,9 @@
         }
         public function getIdProducto(){
             return $this->idProducto;
+        }
+        public function getTiempoPreparacion(){
+            return $this->tiempoEstimadoProducto;
         }
 //********************************************** SETTERS *************************************************************
         public function setNombre($nombre){
@@ -46,7 +51,11 @@
                 $this->tipo = $tipo;
             }
         }
-        
+        public function setTiempoPreparacion($tiempo){
+            if(isset($tiempoPreparacion)){
+                $this->tiempoEstimadoProducto = $tiempo;
+            }
+        }
 //********************************************** FUNCIONES *************************************************************
         /**
          * Sprint 1:
@@ -55,11 +64,13 @@
          */
         public static function crear($producto){
             $objAccesoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccesoDB->retornarConsulta("INSERT INTO productos (nombre,sector,precio,tipo) values (:nombre,:sector,:precio,:tipo)");
+            $consulta = $objAccesoDB->retornarConsulta("INSERT INTO productos (nombre,sector,precio,tipo,tiempoEstimado) values (:nombre,:sector,:precio,:tipo,:tiempoEstimadoPreparacion)");
             $consulta->bindValue(':nombre', $producto->getNombre(), PDO::PARAM_STR);
             $consulta->bindValue(':sector', $producto->getSector(), PDO::PARAM_STR);
             $consulta->bindValue(':precio', $producto->getPrecio());
             $consulta->bindValue(':tipo', $producto->getTipo(), PDO::PARAM_STR);
+            $consulta->bindValue(':tipo', $producto->getTipo(), PDO::PARAM_STR);
+            $consulta->bindValue(':tiempoEstimadoPreparacion', $producto->getTiempoPreparacion(), PDO::PARAM_INT);
 
             $consulta->execute();
             return $objAccesoDB->retornarUltimoInsertado();
@@ -73,7 +84,7 @@
          */
         public static function obtenerTodos(){
             $objAccesoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccesoDB->retornarConsulta("SELECT idProducto,nombre,sector,precio,tipo FROM productos");
+            $consulta = $objAccesoDB->retornarConsulta("SELECT idProducto,nombre,sector,precio,tipo,tiempoEstimado FROM productos");
             $consulta->execute();
 
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'Producto');
@@ -81,7 +92,7 @@
         
         public static function obtenerUno($valor){
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccessoDB->retornarConsulta("SELECT idProducto,nombre,sector,precio,tipo FROM productos WHERE idProducto = :valor");
+            $consulta = $objAccessoDB->retornarConsulta("SELECT idProducto,nombre,sector,precio,tipo,tiempoEstimado FROM productos WHERE idProducto = :valor");
             $consulta->bindValue(':valor', $valor, PDO::PARAM_INT);
             $consulta->execute();
 
@@ -90,12 +101,13 @@
         public static function modificar($prod){
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccessoDB->retornarConsulta("UPDATE productos SET nombre = :nombre, sector = :sector, precio = :precio,
-            tipo = :tipo WHERE idProducto = :id");
+            tipo = :tipo,tiempoEstimado = :tiempoEstimado WHERE idProducto = :id");
             $consulta->bindValue(':id', $prod->getIdProducto(), PDO::PARAM_INT);
             $consulta->bindValue(':nombre', $prod->getNombre(), PDO::PARAM_STR);
             $consulta->bindValue(':sector', $prod->getSector(), PDO::PARAM_STR);
             $consulta->bindValue(':precio', $prod->getPrecio(), PDO::PARAM_INT);
             $consulta->bindValue(':tipo', $prod->getTipo(), PDO::PARAM_STR);
+            $consulta->bindValue(':precio', $prod->getTiempoPreparacion(), PDO::PARAM_INT);
             return $consulta->execute();
         }
 
@@ -113,6 +125,27 @@
             $consulta->bindValue(':id', $id, PDO::PARAM_INT);
             $consulta->bindValue(':fechabaja',date_format($fechaBaja, 'Y-m-d'));
             return $consulta->execute();
+        }
+
+        
+        public static function ValidarPedido($rol){
+            $sector = "vacio";
+            switch ($rol)
+            {
+                case "Bartender":
+                    $sector = "Vinoteca";
+                    break;
+                case "Cervecero":
+                    $sector = "Cerveceria";
+                    break;
+                case "Cocinero":
+                    $sector = "Cocina";
+                    break;
+                case "Candybar"://-->Pastelero no esta certificado en el enunciado
+                    $sector = "CandyBar";
+                break;
+            }
+            return $sector;
         }
 
 }

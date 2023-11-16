@@ -9,7 +9,10 @@ luego en el navegador poner localhost:666
 
 cerrar servidor ctrl + C
 
-->Para JWT en el composer.json poner: "firebase/php-jwt": "^4.0"
+AUTENTIFICADOR JWT:
+composer require firebase/php-jwt
+
+->Para JWT en el composer.json poner: "firebase/php-jwt": "4.0"
 Luego tirar en la raiz del proyecto composer update
 
 =============================================================================
@@ -22,6 +25,35 @@ y que la mesa no este con estado 'BAJA'.
 ->Cambiar pedidos tiene los productos. No hay pedido - idProducto.
 Pedidos tiene que tener los productos,
 
+-> Estados: Que no estarías cambiando el estado de un producto individual,
+ sino de todo el pedido. Se entrega todo o no se entrega nada.
+
+-> Si no pago se pueden agregar items
+
+->Al hacer el insert se relaciona el pedido de la tabla Producto-Pedido
+con n cantidad de productos.
+
+-> De pedido se deberia de sacar idProducto, cantidad, idEmpleado
+idEmpleado deberia de ir en producto que es el responsable de crearlo?
+
+->pedido varios productos son distintas request llegan distintos pedidos,,
+
+->pedidos estado y tabla intermedia
+
+reuqest epdidio:
+trae toda info del pedio, con array d productos solicitados
+
+se verifica que existen
+
+se da de alta el pedido y obtiene el cod alfanumerico, el estimado 
+del pedio es en base al grupo relacionado del array
+
+se inserta en la tabla intermedia el cod de pedido, id prod, estado
+
+UPDATE DE ESTADOS: recibe el cod de pedido y el idProd,
+modificara su estado en la tabla intermedia y se cambia el estado del pedio
+
+
 =============================================================================
                                 PRODUCTO:  
 -> Luego en PEDIDOS al poner el tiempo estimado de preparacion deberia
@@ -33,63 +65,21 @@ finalizacion que es al entregarse.
 ->Producto debreia de tener tambien el tipo estimado de preparacion para
 luego calcular entre todos los productos de un mismo pedido se calcule el de
 mayor tiempo d preparacion 
-============================================================================= 
-                                GENERAL:
 
-->Cada sector ve su propio producto
+->Producto deberia de tener un estado para saber como esta si se termino o que
 
-->Cocinero va al candybar, y tiene un UNICO SECTOR, 
-no hace MAS de una cosa a la vez.
+-> En producto se deberia de agregar el estado y el id de la tabla Pedido-Producto?
+->prod tiene el estimado de tiempo
+==============================================================================
+                            EL TEMA TIEMPOS:
+-> Tiempo estimado es asignado por el preparador del producto, es decir,
+el producto tiene un tipo estimado tambien.
+Entre todos los tiempos asignados a un producto al pedido se le asigna
+el valor maximo entre cantidades y tiempo. 
+Pero el tiempo de Inicio y Fin de un pedido se debe de quedar en su tabla Pedidos
 
-
-=============================================================================
-                                MIDDLEWARE
-->Verificacion de usuarios para las distintas tareas de la COMANDA    
-
-->Se hace antes que  la peticion llegue a la API, se verifica que este
-en el sistema el usuario.
-
-->Validacion de inputs
-
-->Si viene campo sector, bueno FILTRO para donde va a ir.
-
-->Esta semana usar la linea sector === "sector" unicamente, luego
-si se usa JWT
-
-->Como hago para los GET porque los toma por params y no por body.
-
-=============================================================================
-                                    JWT:
-->JSON web TOKEn. 
-
-->Dentro del header de la app el token valida el usuario
-
-->Trae info importante como la hora de registro
-
-->Clave para empleados se debe d agregar
-
-->Ademas tengo que crear lo de administrador.
-
-AUTENTIFICADOR JWT:
-composer require firebase/php-jwt
-=============================================================================
-                                SPRINT II:
-
-->Si en cantidad del producto +1 se multiplica el tiempo estimado
-
-->Al iniciar un pedido se debe de asignar el ID del empleado que lo toma?
-
-=============================================================================
-                                SPRINT III:
-->Autificacion JWT.
-
-->Manejo archivos .csv
-
-->En empleado poner una clave, modificar su clase y alta.
-
-->Para csv se toma cualquier entidad y se hace el registro y descarga
 ===============================================================================
-DE CORRECCIONES QUEDA HACER:
+DE LOS PDFS QUEDA POR HACER:
 Cada empleado responsable de cada producto del pedido , debe:
 ❏ Listar todos los productos pendientes de este tipo de empleado.
 
@@ -104,6 +94,8 @@ demora de su pedido.
 ❏ 11- El cliente ingresa el código de mesa y el del pedido junto con los datos de la encuesta.
 ❏ 12- Alguno de los socios pide los mejores comentarios
 ❏ 13- Alguno de los socios pide la mesa más usada.
+
+Y TODA LA PARTE DE ADMINISTRADOR!
 
 ================================================================================
                                     CORRECCIONES:

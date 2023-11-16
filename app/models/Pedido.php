@@ -7,21 +7,16 @@
 //********************************************** ATRIBUTOS *************************************************************        
         public $idPedido;
         public $codigoPedido;
-        public $idEmpleado;
         public $nombreCliente; 
         public $estado;//“pendiente”,“en preparación”,“listo para servir”,
         public $tiempoEstimadoPreparacion;
-        public $tiempoInicio;
-        public $tiempoFin;
+        public $tiempoInicio;//-->Cuando inicia
+        public $tiempoFin;//-->se queda
         public $idMesa;
         public $fotoMesa;
-        public $idProducto;
-        public $cantidad; 
         public $pedidoFacturado;//-->false no se facturo aun, true si.
+        public $costoTotal;
 //********************************************** GETTERS *************************************************************        
-        public function getIDEmpleado(){
-            return $this->idEmpleado;
-        }
         public function getIDPedido(){
             return $this->idPedido;
         }
@@ -45,12 +40,9 @@
         }
         public function getFotoMesa(){
             return $this->fotoMesa;
-        } 
-        public function getIDProducto(){
-            return $this->idProducto;
         }
-        public function getCantidad(){
-            return $this->cantidad;
+        public function getCostoTotal(){
+            return $this->costoTotal;
         }
         public function getCodigoPedido(){
             return $this->codigoPedido;
@@ -59,14 +51,9 @@
             return $this->pedidoFacturado;
         }
 //********************************************** SETTERS *************************************************************        
-        public function setIDEmpleado($idEmpleado){
-            if(isset($idEmpleado) && is_int($idEmpleado)){
-                $this->idEmpleado = $idEmpleado;
-            }
-        }
-        public function setIDProducto($idProducto){
-            if(isset($idProducto) && is_int($idProducto)){
-                $this->idProducto = $idProducto;
+        public function setCostoTotal($costoTotal){
+            if(isset($costoTotal) && is_float($costoTotal)){
+                $this->costoTotal = $costoTotal;
             }
         } 
         public function setIDMesa($idMesa){
@@ -104,11 +91,6 @@
                 $this->fotoMesa = $fotoMesa;
             }
         }
-        public function setCantidad($cantidad){
-            if(isset($cantidad)){
-                $this->cantidad = $cantidad;
-            }
-        } 
         public function setCodigoPedido($codigoPedido){
             if(isset($codigoPedido)){
                 $this->codigoPedido = $codigoPedido;
@@ -122,23 +104,16 @@
 //********************************************** FUNCIONES *************************************************************        
                 
         public static function crear($pedido){ 
-            // $tiempoInicio = $pedido->getTiempoInicio();   
-            // var_dump($pedido);
-
             $objAccesoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccesoDB->retornarConsulta("INSERT INTO pedidos 
-            (idEmpleado, idProducto, nombreCliente, estado, tiempoEstimadoPreparacion, idMesa, fotoMesa, cantidad, codigoPedido, pedidoFacturado)
-            VALUES (:idEmpleado, :idProducto, :nombreCliente, :estado, :tiempoEstimadoPreparacion, :idMesa, :fotoMesa, :cantidad, :codigoPedido, :pedidoFacturado)");
+            (nombreCliente, estado, tiempoEstimadoPreparacion, idMesa, fotoMesa, codigoPedido, pedidoFacturado)
+            VALUES ( :nombreCliente, :estado, :tiempoEstimadoPreparacion, :idMesa, :fotoMesa, :codigoPedido, :pedidoFacturado)");
 
-            $consulta->bindValue(':idEmpleado', $pedido->getIDEmpleado(), PDO::PARAM_INT);
-            $consulta->bindValue(':idProducto', $pedido->getIDProducto(), PDO::PARAM_INT);
             $consulta->bindValue(':nombreCliente', $pedido->getNombreCliente(), PDO::PARAM_STR);
             $consulta->bindValue(':estado', $pedido->getEstado(), PDO::PARAM_STR);
             $consulta->bindValue(':tiempoEstimadoPreparacion', $pedido->getTiempoEstimadoPreparacion(), PDO::PARAM_INT);
-            // $consulta->bindValue(':tiempoInicio', $tiempoInicio->format('H:i:sa'));  
             $consulta->bindValue(':idMesa', $pedido->getIDMesa(), PDO::PARAM_INT);
             $consulta->bindValue(':fotoMesa', $pedido->getFotoMesa());
-            $consulta->bindValue(':cantidad', $pedido->getCantidad(), PDO::PARAM_INT); 
             $consulta->bindValue(':codigoPedido', $pedido->getCodigoPedido(), PDO::PARAM_STR);
             $consulta->bindValue(':pedidoFacturado', false, PDO::PARAM_BOOL);//-->Si se creo aun no esta facturado
             $consulta->execute();
@@ -156,8 +131,8 @@
 
         public static function obtenerUno($valor){
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccessoDB->retornarConsulta("SELECT idPedido,idEmpleado,estado,tiempoEstimadoPreparacion,tiempoInicio,tiempoFin,idMesa,fotoMesa,
-            idProducto,cantidad,nombreCliente,codigoPedido,pedidoFacturado FROM pedidos WHERE idPedido = :valor");
+            $consulta = $objAccessoDB->retornarConsulta("SELECT idPedido,estado,tiempoEstimadoPreparacion,tiempoInicio,tiempoFin,idMesa,fotoMesa,
+            nombreCliente,codigoPedido,pedidoFacturado FROM pedidos WHERE idPedido = :valor");
             $consulta->bindValue(':valor', $valor, PDO::PARAM_INT);
             $consulta->execute();
 
@@ -165,23 +140,22 @@
         }
 
         public static function modificar($pedido){
-            var_dump($pedido);
+            // var_dump($pedido);
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccessoDB->retornarConsulta("UPDATE pedidos SET codigoPedido = :codigoPedido, fotoMesa = :fotoMesa,
-            idMesa = :idMesa, idProducto = :idProducto, nombreCliente = :nombreCliente, estado = :estado, tiempoEstimadoPreparacion = :tiempoEstimadoPreparacion,
-            tiempoInicio = :tiempoInicio,tiempoFin = :tiempoFin, pedidoFacturado = :pedidoFacturado WHERE idPedido = :id");
+            idMesa = :idMesa, nombreCliente = :nombreCliente, estado = :estado, tiempoEstimadoPreparacion = :tiempoEstimadoPreparacion,
+            tiempoInicio = :tiempoInicio,tiempoFin = :tiempoFin, pedidoFacturado = :pedidoFacturado, costoTotal = :costoTotal WHERE idPedido = :id");
             $consulta->bindValue(':id', $pedido->getIDPedido(), PDO::PARAM_INT);
             $consulta->bindValue(':codigoPedido', $pedido->getCodigoPedido(), PDO::PARAM_STR);
             $consulta->bindValue(':fotoMesa', $pedido->getFotoMesa(), PDO::PARAM_STR);
             $consulta->bindValue(':idMesa', $pedido->getIDMesa(), PDO::PARAM_INT);
-            $consulta->bindValue(':idProducto', $pedido->getIDProducto(), PDO::PARAM_INT);
             $consulta->bindValue(':nombreCliente', $pedido->getNombreCliente(), PDO::PARAM_STR);
             $consulta->bindValue(':estado', $pedido->getEstado(), PDO::PARAM_STR);
             $consulta->bindValue(':tiempoEstimadoPreparacion', $pedido->getTiempoEstimadoPreparacion(), PDO::PARAM_STR);
             $consulta->bindValue(':tiempoInicio', $pedido->getTiempoInicio(), PDO::PARAM_STR);
             $consulta->bindValue(':tiempoFin', $pedido->getTiempoFin(), PDO::PARAM_STR);
             $consulta->bindValue(':pedidoFacturado', $pedido->getPedidoFacturado(), PDO::PARAM_BOOL);
-
+            $consulta->bindValue(':costoTotal', $pedido->getCostoTotal(), PDO::PARAM_INT);
             $consulta->execute();
         }
 
@@ -196,26 +170,6 @@
             $consulta->bindValue(':id', $id, PDO::PARAM_STR);
             $consulta->bindValue(':pedidoFacturado',true,PDO::PARAM_BOOL);
             $consulta->execute();
-        }
-
-        public static function ValidarPedido($rol){
-            $sector = "vacio";
-            switch ($rol)
-            {
-                case "Bartender":
-                    $sector = "Vinoteca";
-                    break;
-                case "Cervecero":
-                    $sector = "Cerveceria";
-                    break;
-                case "Cocinero":
-                    $sector = "Cocina";
-                    break;
-                case "Candybar"://-->Pastelero no esta certificado en el enunciado
-                    $sector = "CandyBar";
-                break;
-            }
-            return $sector;
         }
 
         /**
@@ -245,7 +199,7 @@
          */
         public static function GetPedidosPendientes($rol)
         {
-            $sector = self::ValidarPedido($rol);
+            $sector = Producto::ValidarPedido($rol);
 
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccessoDB->retornarConsulta("SELECT pedidos.*

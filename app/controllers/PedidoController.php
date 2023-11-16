@@ -3,6 +3,7 @@
     include_once "./models/Pedido.php";
     include_once "./models/Mesa.php";
     include_once "./models/Producto.php";
+    include_once "./models/PedidoProducto.php";
     require_once "./interfaces/IApiUsable.php";
 
     class PedidoController extends Pedido implements IApiUsable{
@@ -12,23 +13,55 @@
             $files = $request->getUploadedFiles();
  
             $parametros = $request->getParsedBody();
-            $idProducto = Producto::obtenerUno(intval($parametros['idProducto']));
-            $cantidad = intval($parametros['cantidad']);
             $idMesa = Mesa::obtenerUno(intval($parametros['idMesa'])); 
             $nombreCliente = $parametros['nombreCliente'];
+            $productosRecibidos = $parametros['productos'];
+            $tiempoEstimado = 0;
+            $totalPedido = 0;
 
             //-->Valido la existencia de la mesa y el prod
-            if($idMesa !== null && $idProducto !== null){
+            if($idMesa !== null){
                 $pedido = new Pedido();
                 $pedido->setNombreCliente($nombreCliente);
                 $pedido->setIDMesa($idMesa->getIdMesa());  
                 $pedido->setEstado(self::$estadosPedido[0]);//-->Pendiente
-                $pedido->setIDProducto($idProducto->getIdProducto()); 
-                $pedido->setIDEmpleado(0);
-                $pedido->setTiempoEstimado(0); 
                 $pedido->setTiempoInicio(0);
                 $pedido->setCodigoPedido(CrearCodigo(5));
-                $pedido->setCantidad($cantidad);
+                                
+                //-->Obtengo el precio total y el tiempo mayor de preparacion entre productos.
+                foreach ($productosRecibidos as $prod) {
+                    $productoExistente = Producto::obtenerUno($prod->getIdProducto());
+                    if($productoExistente !== false){//-->Quiere decir que existe
+                        if($productoExistente->getTiempoEstimado() > $tiempoEstimado){
+                            $tiempoEstimado = $productoExistente->getTiempoEstimado();//-->Almacena el tiempo estimado mayor
+                        }
+                        
+                        //-->Se acumulan los totales.
+                        $totalPedido += $productoExistente->getPrecio();
+                        
+                        $productos[] = $productoExistente;//-->Lo guardo en el array
+                    }
+                    else{
+                        $payload = json_encode(array("Mensaje" => "El producto ingresado no se encuentra disponible."));
+                    }
+                }
+                
+                $pedido->setTiempoEstimado($tiempoEstimado);
+                $pedido->setCostoTotal($totalPedido);
+
+                Pedido::crear($pedido);
+
+                //-->Voy a la tabla intermedia
+                foreach ($productos as $product) {
+                    $pedidoProducto = new PedidoProducto();
+                    $pedidoProducto->setCodPedido($pedido->getCodigoPedido());
+                    $pedidoProducto->setEstado(self::$estadosPedido[0]);
+                    $pedidoProducto->setTiempoEstimado($product->getTiempoEstimado());
+                    $pedidoProducto->setIdProducto($product->getIdProducto());
+                    $pedidoProducto->setIdEmpleado(0);
+
+                    PedidoProducto::crear($pedidoProducto);
+                }
 
                 //-->Guardo la imagen
                 // var_dump($uploadedFiles);
@@ -44,12 +77,10 @@
                     Mesa::modificar($idMesa);
                 }
 
-                Pedido::crear($pedido);
-
                 $payload = json_encode(array("Mensaje" => "Pedido creado con éxito"));
             }
             else{
-                $payload = json_encode(array("Mensaje" => "El producto o la mesa no existen!"));
+                $payload = json_encode(array("Mensaje" => "La mesa asignada no existe!"));
             }
     
             $response->getBody()->write($payload);
@@ -142,7 +173,7 @@
             $cantidad = $pedido->getCantidad();
         
             if($pedido && $pedido->getEstado() == "pendiente" &&
-               Producto::obtenerUno($pedido->getIDProducto())->getSector() == Pedido::ValidarPedido($rol)){
+               Producto::obtenerUno($pedido->getIDProducto())->getSector() == Producto::ValidarPedido($rol)){
     
                 $pedido->setTiempoEstimado($tiempoEstimadoPreparacion->format('H:i:sa'));
         
@@ -179,7 +210,7 @@
             if($pedido){
                 var_dump($pedido);
                 if($pedido->getEstado() == "En preparacion" &&
-                Producto::obtenerUno($pedido->getIDProducto())->getSector() == Pedido::ValidarPedido($rol)){
+                Producto::obtenerUno($pedido->getIDProducto())->getSector() == Producto::ValidarPedido($rol)){
                     $pedido->setTiempoFin($tiempoFinalizacion->format('H:i:sa'));//-->Se asigna el tiempo de finalizacion
                     $pedido->setEstado("listo para servir");
                     Pedido::modificar($pedido);
