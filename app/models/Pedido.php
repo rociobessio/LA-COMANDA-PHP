@@ -52,7 +52,7 @@
         }
 //********************************************** SETTERS *************************************************************        
         public function setCostoTotal($costoTotal){
-            if(isset($costoTotal) && is_float($costoTotal)){
+            if(isset($costoTotal)){
                 $this->costoTotal = $costoTotal;
             }
         } 
@@ -106,8 +106,8 @@
         public static function crear($pedido){ 
             $objAccesoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccesoDB->retornarConsulta("INSERT INTO pedidos 
-            (nombreCliente, estado, tiempoEstimadoPreparacion, idMesa, fotoMesa, codigoPedido, pedidoFacturado)
-            VALUES ( :nombreCliente, :estado, :tiempoEstimadoPreparacion, :idMesa, :fotoMesa, :codigoPedido, :pedidoFacturado)");
+            (nombreCliente, estado, tiempoEstimadoPreparacion, idMesa, fotoMesa, codigoPedido, pedidoFacturado,costoTotal)
+            VALUES ( :nombreCliente, :estado, :tiempoEstimadoPreparacion, :idMesa, :fotoMesa, :codigoPedido, :pedidoFacturado, :costoTotal)");
 
             $consulta->bindValue(':nombreCliente', $pedido->getNombreCliente(), PDO::PARAM_STR);
             $consulta->bindValue(':estado', $pedido->getEstado(), PDO::PARAM_STR);
@@ -116,6 +116,7 @@
             $consulta->bindValue(':fotoMesa', $pedido->getFotoMesa());
             $consulta->bindValue(':codigoPedido', $pedido->getCodigoPedido(), PDO::PARAM_STR);
             $consulta->bindValue(':pedidoFacturado', false, PDO::PARAM_BOOL);//-->Si se creo aun no esta facturado
+            $consulta->bindValue(':costoTotal', $pedido->getCostoTotal(), PDO::PARAM_INT);
             $consulta->execute();
 
             return $objAccesoDB->retornarUltimoInsertado();

@@ -10,7 +10,7 @@
         public $precio;
         public $tipo;
         //-->tiempo 
-        public $tiempoEstimadoProducto;
+        public $tiempoEstimado;
 //********************************************** GETTERS *************************************************************
         public function getNombre(){
             return $this->nombre;
@@ -28,7 +28,7 @@
             return $this->idProducto;
         }
         public function getTiempoPreparacion(){
-            return $this->tiempoEstimadoProducto;
+            return $this->tiempoEstimado;
         }
 //********************************************** SETTERS *************************************************************
         public function setNombre($nombre){
@@ -51,9 +51,9 @@
                 $this->tipo = $tipo;
             }
         }
-        public function setTiempoPreparacion($tiempo){
-            if(isset($tiempoPreparacion)){
-                $this->tiempoEstimadoProducto = $tiempo;
+        public function setTiempoEstimado($tiempo){
+            if(isset($tiempo)){
+                $this->tiempoEstimado = $tiempo;
             }
         }
 //********************************************** FUNCIONES *************************************************************
@@ -64,17 +64,15 @@
          */
         public static function crear($producto){
             $objAccesoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccesoDB->retornarConsulta("INSERT INTO productos (nombre,sector,precio,tipo,tiempoEstimado) values (:nombre,:sector,:precio,:tipo,:tiempoEstimadoPreparacion)");
+            $consulta = $objAccesoDB->retornarConsulta("INSERT INTO productos (nombre, sector, precio, tipo, tiempoEstimado) values (:nombre, :sector, :precio, :tipo, :tiempoEstimado)");
             $consulta->bindValue(':nombre', $producto->getNombre(), PDO::PARAM_STR);
             $consulta->bindValue(':sector', $producto->getSector(), PDO::PARAM_STR);
             $consulta->bindValue(':precio', $producto->getPrecio());
             $consulta->bindValue(':tipo', $producto->getTipo(), PDO::PARAM_STR);
-            $consulta->bindValue(':tipo', $producto->getTipo(), PDO::PARAM_STR);
-            $consulta->bindValue(':tiempoEstimadoPreparacion', $producto->getTiempoPreparacion(), PDO::PARAM_INT);
+            $consulta->bindValue(':tiempoEstimado', $producto->getTiempoPreparacion(), PDO::PARAM_STR);            
 
             $consulta->execute();
-            return $objAccesoDB->retornarUltimoInsertado();
-            
+            return $objAccesoDB->retornarUltimoInsertado();   
         }
         /**
          * Sprint 1:
@@ -98,6 +96,12 @@
 
             return $consulta->fetchObject('Producto');
         }
+
+        /**
+         * Me permitira modificar
+         * los valores de un producto que se 
+         * encuentre en la tabla productos.
+         */
         public static function modificar($prod){
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccessoDB->retornarConsulta("UPDATE productos SET nombre = :nombre, sector = :sector, precio = :precio,
@@ -107,7 +111,7 @@
             $consulta->bindValue(':sector', $prod->getSector(), PDO::PARAM_STR);
             $consulta->bindValue(':precio', $prod->getPrecio(), PDO::PARAM_INT);
             $consulta->bindValue(':tipo', $prod->getTipo(), PDO::PARAM_STR);
-            $consulta->bindValue(':precio', $prod->getTiempoPreparacion(), PDO::PARAM_INT);
+            $consulta->bindValue(':tiempoEstimado', $prod->getTiempoPreparacion(), PDO::PARAM_STR);
             return $consulta->execute();
         }
 

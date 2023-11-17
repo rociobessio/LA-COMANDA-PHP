@@ -27,6 +27,9 @@
         public function getIdEmpleado(){
             return $this->idEmpleado;
         }
+        public function getTiempoEstimado(){
+            return $this->tiempoEstimado;
+        }
 //********************************************** SETTERS *************************************************************     
         public function setCodPedido($codPedido){
             if(isset($codPedido) && !empty($codPedido)){
