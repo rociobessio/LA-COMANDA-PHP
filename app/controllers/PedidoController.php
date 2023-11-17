@@ -7,20 +7,26 @@
     require_once "./interfaces/IApiUsable.php";
 
     class PedidoController extends Pedido implements IApiUsable{
+        //-->Estados disponibles para los pedidos.
         public static $estadosPedido = array("pendiente", "listo para servir", "en preparacion","entregado");
 
         public static function CargarUno($request, $response, $args){ 
-            $files = $request->getUploadedFiles();
- 
+             $files = $request->getUploadedFiles();
+
             $parametros = $request->getParsedBody();
             $idMesa = Mesa::obtenerUno(intval($parametros['idMesa'])); 
+            // var_dump(intval($parametros['idMesa']));
+            
             $nombreCliente = $parametros['nombreCliente'];
-            $productosRecibidos = $parametros['productos'];
             $tiempoEstimado = 0;
             $totalPedido = 0;
+            //-->Tengo que pasar el string d productos a array:
+            $productosRecibidos =  json_decode($parametros['productos'], true);
+            // var_dump(is_array($productosRecibidos));
+            // var_dump($productosRecibidos);
 
-            //-->Valido la existencia de la mesa y el prod
-            if($idMesa !== null){
+            //-->Valido la existencia de la mesa
+            if($idMesa !== false){
                 $pedido = new Pedido();
                 $pedido->setNombreCliente($nombreCliente);
                 $pedido->setIDMesa($idMesa->getIdMesa());  
@@ -30,10 +36,14 @@
                                 
                 //-->Obtengo el precio total y el tiempo mayor de preparacion entre productos.
                 foreach ($productosRecibidos as $prod) {
-                    $productoExistente = Producto::obtenerUno($prod->getIdProducto());
+                    // echo "producto recibido:";
+                    // var_dump($prod);
+
+                    $productoExistente = Producto::obtenerUno($prod['idProducto']);
+                    
                     if($productoExistente !== false){//-->Quiere decir que existe
-                        if($productoExistente->getTiempoEstimado() > $tiempoEstimado){
-                            $tiempoEstimado = $productoExistente->getTiempoEstimado();//-->Almacena el tiempo estimado mayor
+                        if($productoExistente->getTiempoPreparacion() > $tiempoEstimado){
+                            $tiempoEstimado = $productoExistente->getTiempoPreparacion();//-->Almacena el tiempo estimado mayor
                         }
                         
                         //-->Se acumulan los totales.
@@ -45,30 +55,32 @@
                         $payload = json_encode(array("Mensaje" => "El producto ingresado no se encuentra disponible."));
                     }
                 }
-                
+                var_dump($totalPedido);
                 $pedido->setTiempoEstimado($tiempoEstimado);
                 $pedido->setCostoTotal($totalPedido);
+
+                //-->Guardo la imagen
+                // var_dump($files);
+                if (isset($files['fotoMesa'])) {
+                    $ruta = './imgs/' . date_format(new DateTime(), 'Y-m-d_H-i-s') . '_' . $nombreCliente . '_Mesa_' . $idMesa->getIdMesa() . '.jpg';
+                    $files['fotoMesa']->moveTo($ruta);
+                    $pedido->setFotoMesa($ruta);
+                }
 
                 Pedido::crear($pedido);
 
                 //-->Voy a la tabla intermedia
                 foreach ($productos as $product) {
+                    echo 'llegue al foreach, producto:';
+                    // var_dump($product);
                     $pedidoProducto = new PedidoProducto();
                     $pedidoProducto->setCodPedido($pedido->getCodigoPedido());
                     $pedidoProducto->setEstado(self::$estadosPedido[0]);
-                    $pedidoProducto->setTiempoEstimado($product->getTiempoEstimado());
+                    $pedidoProducto->setTiempoEstimado($product->getTiempoPreparacion());
                     $pedidoProducto->setIdProducto($product->getIdProducto());
                     $pedidoProducto->setIdEmpleado(0);
 
                     PedidoProducto::crear($pedidoProducto);
-                }
-
-                //-->Guardo la imagen
-                // var_dump($uploadedFiles);
-                if (isset($files['fotoMesa'])) {
-                    $ruta = './imgs/' . date_format(new DateTime(), 'Y-m-d_H-i-s') . '_' . $nombreCliente . '_Mesa_' . $idMesa->getIdMesa() . '.jpg';
-                    $files['fotoMesa']->moveTo($ruta);
-                    $pedido->setFotoMesa($ruta);
                 }
               
                 //-->Cambio el estado de la mesa
@@ -77,7 +89,7 @@
                     Mesa::modificar($idMesa);
                 }
 
-                $payload = json_encode(array("Mensaje" => "Pedido creado con éxito"));
+                $payload = json_encode(array("Mensaje" => "Pedido creado con éxito, su codigo es: " . $pedido->getCodigoPedido()));
             }
             else{
                 $payload = json_encode(array("Mensaje" => "La mesa asignada no existe!"));
@@ -164,28 +176,56 @@
          */
         public static function IniciarPedido($request, $response, $args){
             $parametros = $request->getParsedBody();
-            $idPedido = $args['id'];
-        
-            $tiempoEstimadoPreparacion = new DateTime($parametros['tiempoEstimadoPreparacion']);
-            $pedido = Pedido::obtenerUno(intval($idPedido));
-            $rol = $parametros['rol'];
+            $idPedidoProducto = $args['id'];
+            $iniciado = false;
+
+            //-->Me traigo el array relacionado a la tabla intermedia y el pedido
+            $pedidosProductos = PedidoProducto::obtenerTodosLosPedidos($idPedidoProducto);
+            $pedido = Pedido::obtenerUnoPorCodigoPedido($idPedidoProducto);
+
+            //-->Obtengo el rol del empleado:
+            $header = $request->getHeaderLine(("Authorization"));
+            $token = trim(explode("Bearer", $header)[1]);
+            $data = AutentificadorJWT::ObtenerData($token);
+
+            //-->Hay un problema que es que al hacer el rol y sector, si supuestamente,
+            //yo tengo un array de productos y un unico empleado es el que inicializa el pedido
+            //hay sectores y tipos que no coincidiran. Salvo que solo se tomen aquellos pedidos 
+            //relacionados al preparador y luego se van turnando para el resto de coincidencias.
+
+
+            // var_dump($pedidosProductos);
+            // var_dump($data);
+
             $tiempoInicio = new DateTime();
-            $cantidad = $pedido->getCantidad();
-        
-            if($pedido && $pedido->getEstado() == "pendiente" &&
-               Producto::obtenerUno($pedido->getIDProducto())->getSector() == Producto::ValidarPedido($rol)){
-    
-                $pedido->setTiempoEstimado($tiempoEstimadoPreparacion->format('H:i:sa'));
-        
-                $pedido->setTiempoInicio($tiempoInicio->format('H:i:sa'));
-                $pedido->setEstado("En preparacion");
-        
-                //-->Mesa, con cliente esperando pedido?
-                Pedido::modificar($pedido);
-                $payload = json_encode(array("mensaje" => "Pedido iniciado correctamente!"));
-            } else {
-                $payload = json_encode(array("mensaje" => "No se ha podido iniciar el pedido!"));
+
+            //-->Vamos a tener que mediante el cod de pedido buscar en la tabla intermedia,
+            //ir cambiando el estado de los productos relacionados al pedido
+            //Al pedido asignarle un tiempo de inicio y cambiarle el estado al pedido y la tabla intermedia
+            //-->A su vez abria que asignar el id del empleado a cargo del pedido.
+            
+            foreach ($pedidosProductos as $pedidoProducto) {
+                //-->Valido que el estado sea pendiente de ese pedido y que el sector del producto coincida
+                //con el sector del que inicia el pedido:
+                if($pedidoProducto->getEstado() == "pendiente" &&
+                Producto::obtenerUno($pedidoProducto->getIdProducto())->getSector() == Producto::ValidarPedido($data->rol)){
+                    // echo 'entre';
+                    $pedido->setTiempoInicio($tiempoInicio->format('H:i:sa'));//-->Al pedido le asigno el tiempo de inicio
+                    $pedido->setEstado("En preparacion");
+
+                    Pedido::modificar($pedido);//-->Solo modifico su estado y inicio de preparacion
+
+                    //-->En la tabla intermedia cambio el estado y asigno el id del empleado a cargo
+                    $pedidoProducto->setEstado("En preparacion");
+                    $pedidoProducto->setIdEmpleado($data->id);
+                    // var_dump($pedidoProducto);
+                    PedidoProducto::modificar($pedidoProducto);
+                    
+                    $iniciado = true;
+               }
             }
+            if($iniciado){$payload = json_encode(array("mensaje" => "Pedido iniciado correctamente!"));}
+            else{$payload = json_encode(array("mensaje" => "No se ha podido iniciar el pedido, puede ser error en rol!"));}
         
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
@@ -201,27 +241,48 @@
          * SPRINT II.W
          */
         public static function FinalizarPedido($request, $response, $args){
-            $parametros = $request->getParsedBody();
-            $idPedido = $args['id'];       
-            $pedido = Pedido::obtenerUno(intval($idPedido));
-            $rol = $parametros['rol'];
+            $finalizado = false;
+            //-->Obtengo el rol del empleado:
+            $header = $request->getHeaderLine(("Authorization"));
+            $token = trim(explode("Bearer", $header)[1]);
+            $data = AutentificadorJWT::ObtenerData($token);
+
+            $idPedidoProducto = $args['id'];
+            
+            //-->Me traigo el array relacionado a la tabla intermedia y el pedido
+            $pedidosProductos = PedidoProducto::obtenerTodosLosPedidos($idPedidoProducto);
+            $pedido = Pedido::obtenerUnoPorCodigoPedido($idPedidoProducto);
             $tiempoFinalizacion = new DateTime();
 
-            if($pedido){
-                var_dump($pedido);
-                if($pedido->getEstado() == "En preparacion" &&
-                Producto::obtenerUno($pedido->getIDProducto())->getSector() == Producto::ValidarPedido($rol)){
-                    $pedido->setTiempoFin($tiempoFinalizacion->format('H:i:sa'));//-->Se asigna el tiempo de finalizacion
-                    $pedido->setEstado("listo para servir");
-                    Pedido::modificar($pedido);
-                    $payload = json_encode(array("mensaje" => "Pedido ha finalizado de prepararse, ya se puede entregar!"));
+            if($pedidosProductos){
+            //-->Recorro la tabla intermedia y cambio el estado, 
+            //me fijo que el estado del producto en el pedido al menos sea "En preparacion" y el rol del empleado
+            //-->El tiempo de finalizacion de un pedido se asigna cuando termino el producto o todos estan finalizados
+                foreach($pedidosProductos as $pedidoProducto){
+                    if($pedidoProducto->getEstado() == "En preparacion" &&
+                    Producto::obtenerUno($pedidoProducto->getIdProducto())->getSector() == Producto::ValidarPedido($data->rol)){
+                        $pedido->setTiempoFin($tiempoFinalizacion->format('H:i:sa'));//-->Setteo el tiempo de finalizacion
+                        $pedido->setEstado("listo para servir");
+
+                        Pedido::modificar($pedido);//-->Lo modifico
+
+                        //-->En la tabla intermedia cambio el estado y asigno el id del empleado a cargo
+                        $pedidoProducto->setEstado("listo para servir");
+                        $pedidoProducto->setIdEmpleado($data->id);
+                        // var_dump($pedidoProducto);
+                        PedidoProducto::modificar($pedidoProducto);
+                        
+                        $finalizado = true;
+                    }
                 }
-                else
-                    $payload = json_encode(array("mensaje" => "Error en querer finalizar el, es posible que no este en preparacion!"));
+                
+                if($finalizado){$payload = json_encode(array("mensaje" => "Producto/s finalizados, listos para entregar!"));}
+                else{$payload = json_encode(array("mensaje" => "Error en querer finalizar la preparacion de un produto, es posible que no este en preparacion o haya error con el rol!"));}
             }
             else {
-            $payload = json_encode(array("mensaje" => "ID no coinciden con ningun Pedido!"));
-          }
+                $payload = json_encode(array("mensaje" => "ID no coinciden con ningun Pedido!"));
+            }
+
           $response->getBody()->write($payload);
           return $response
             ->withHeader('Content-Type', 'application/json');
@@ -236,32 +297,59 @@
          * Cambio el estado del pedido y el estado de la
          * mesa.
          * 
+         * Ademas deberian de estar TODOS los productos
+         * de un pedido listos para servirse para poder
+         * entregarlo.
+         * 
          * Por ultimo los modifico en sus tablas.
          * 
          * SPRINT II.
          */
         public static function EntregarPedido($request, $response, $args){
-            $parametros = $request->getParsedBody();
-            $idPedido = $args['id'];       
-            $pedido = Pedido::obtenerUno(intval($idPedido));
-            $rol = $parametros['rol'];
+            $entregado = false;
+            $idPedidoProducto = $args['id'];
+            
+            //-->Me traigo el array relacionado a la tabla intermedia y el pedido
+            $pedidosProductos = PedidoProducto::obtenerTodosLosPedidos($idPedidoProducto);
+            $pedido = Pedido::obtenerUnoPorCodigoPedido($idPedidoProducto);
+            $mesa = Mesa::obtenerUno($pedido->getIdMesa());
 
-            if($pedido){
-                $mesa = Mesa::obtenerUno($pedido->getIdMesa());
-                if($pedido->getEstado() == "listo para servir"){
+            //-->Para entregar un pedido tendria que validar que todos los productos
+            //asignados a un pedido esten listos para servir
+            if($pedidosProductos){
+                //-->Valido que todos los productos esten listos para servir.
+                $todosListosParaServir = true;
+                foreach ($pedidosProductos as $pedidoProd) {
+                    if ($pedidoProd->getEstado() != "listo para servir") {
+                        $todosListosParaServir = false;
+                        break;
+                    }
+                }
+
+                //-->Si lo estan modifico.
+                if($todosListosParaServir){
                     $pedido->setEstado("entregado");
-                    Pedido::modificar($pedido);
+                    Pedido::modificar($pedido);//-->Lo modifico
 
-                    //-->Modifico el estado de la mesa.
-                    if($mesa->getEstado() == "con cliente esperando pedido"){
+                    //-->Recorro en la tabla intermedia y cambio el estado
+                    foreach ($pedidosProductos as $pedidoProd) {
+                        $pedidoProd->setEstado("entregado");
+                        // var_dump($pedidoProducto);
+                        PedidoProducto::modificar($pedidoProd);
+                    }
+
+                    //-->Cambio el estado de la mesa
+                    if($mesa && $mesa->getEstado() == "con cliente esperando pedido"){
                         $mesa->setEstado("con cliente comiendo");
                         Mesa::modificar($mesa);
                     }
-                    $payload = json_encode(array("mensaje" => "Pedido entregado al cliente!"));
+
+                    $entregado = true;
                 }
-                else{$payload = json_encode(array("mensaje" => "Error en querer entregar el pedido, es posible que aun no este disponible para servirse!"));}
-            }
-            else {
+
+                if($entregado){$payload = json_encode(array("mensaje" => "Pedido entregado al cliente!"));}
+                else{$payload = json_encode(array("mensaje" => "Error en querer entregar el pedido, es posible que aun no esten todos los productos disponible para servirse!"));}
+            }else {
                 $payload = json_encode(array("mensaje" => "ID no coinciden con ningun Pedido!"));
             }
 

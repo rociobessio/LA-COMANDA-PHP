@@ -14,8 +14,8 @@ class MWPreparador{
         {
             $data = AutentificadorJWT::ObtenerData($token);
             // var_dump($data);
-            if($data->getRol() == "Mozo" && $data->getRol() == "Socio" && $data->getRol() == "Cocinero" &&
-                 $data->getRol() == "Bartender" && $data->getRol() == "Cervecero" && $data->getRol() == "Candybar")
+            if($data->rol == "Mozo" || $data->rol == "Socio" || $data->rol == "Cocinero" ||
+                 $data->rol == "Bartender" || $data->rol == "Cervecero" || $data->rol == "Candybar")
             {
                 $response= $handler->handle($request);
             }

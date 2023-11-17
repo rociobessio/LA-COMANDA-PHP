@@ -76,7 +76,7 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->delete('/{id}', \PedidoController::class . '::BorrarUno')->add(new MWMozos());
     $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido')->add(new MWPreparador());
     $group->post('/finalizar/{id}', \PedidoController::class . '::FinalizarPedido')->add(new MWPreparador());
-    $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido')->add(new MWPreparador());
+    $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido')->add(new MWMozos());
     $group->get('/consultarPedidosPendientes/[/]', \PedidoController::class . '::ConsultarPedidosPendientes')->add(new MWPreparador());
 })->add(new MWToken());
 

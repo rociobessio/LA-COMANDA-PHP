@@ -10,9 +10,9 @@ luego en el navegador poner localhost:666
 cerrar servidor ctrl + C
 
 AUTENTIFICADOR JWT:
-composer require firebase/php-jwt
+1ro tirar: composer require firebase/php-jwt
 
-->Para JWT en el composer.json poner: "firebase/php-jwt": "4.0"
+2do: en el composer.json poner: "firebase/php-jwt":"4.0"
 Luego tirar en la raiz del proyecto composer update
 
 =============================================================================
@@ -21,9 +21,6 @@ Luego tirar en la raiz del proyecto composer update
 y que la mesa no este con estado 'BAJA'.
 
 ->Cuando hago un ""borrar"" en pedido en realidad es la paga de este.
-
-->Cambiar pedidos tiene los productos. No hay pedido - idProducto.
-Pedidos tiene que tener los productos,
 
 -> Estados: Que no estarías cambiando el estado de un producto individual,
  sino de todo el pedido. Se entrega todo o no se entrega nada.
@@ -53,6 +50,10 @@ se inserta en la tabla intermedia el cod de pedido, id prod, estado
 UPDATE DE ESTADOS: recibe el cod de pedido y el idProd,
 modificara su estado en la tabla intermedia y se cambia el estado del pedio
 
+MANEJO DE ESTADO DE PEDIDOS:
+->se tendra que preparar los productos e ir cambiandole sus estados 
+y en la tabla intermedia se deberia de validar la coincidencia de un mismo pedido
+y cambiarle el estado tambien.
 
 =============================================================================
                                 PRODUCTO:  
@@ -70,13 +71,6 @@ mayor tiempo d preparacion
 
 -> En producto se deberia de agregar el estado y el id de la tabla Pedido-Producto?
 ->prod tiene el estimado de tiempo
-==============================================================================
-                            EL TEMA TIEMPOS:
--> Tiempo estimado es asignado por el preparador del producto, es decir,
-el producto tiene un tipo estimado tambien.
-Entre todos los tiempos asignados a un producto al pedido se le asigna
-el valor maximo entre cantidades y tiempo. 
-Pero el tiempo de Inicio y Fin de un pedido se debe de quedar en su tabla Pedidos
 
 ===============================================================================
 DE LOS PDFS QUEDA POR HACER:

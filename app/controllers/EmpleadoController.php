@@ -111,7 +111,7 @@
             $clave = $parametros['clave'];
 
             $empleado = Empleado::obtenerUnoPorUsuario($nombre,$clave);
-            $data = array('empleado' => $empleado->getNombre(), 'rol' => $empleado->getRol(), 'clave' => $empleado->getClave());
+            $data = array('empleado' => $empleado->getNombre(), 'rol' => $empleado->getRol(), 'clave' => $empleado->getClave(), 'id' =>$empleado->getIDEmpleado());
             $creacionToken = AutentificadorJWT::CrearToken($data);
 
             $response = $response->withHeader('Set-Cookie', 'token=' . $creacionToken['jwt']);

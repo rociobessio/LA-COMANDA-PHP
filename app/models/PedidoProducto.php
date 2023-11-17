@@ -89,18 +89,32 @@
 
             return $consulta->fetchObject('Pedido');
         }
+
+        /**
+         * Me traigo un array con los pedidos
+         * relacionados de la tabla intermedia.
+         */
+        public static function obtenerTodosLosPedidos($codigo){
+            $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
+            $consulta = $objAccessoDB->retornarConsulta("SELECT * FROM pedidos_productos WHERE codPedido = :codPedido");
+            $consulta->bindValue(':codPedido', $codigo, PDO::PARAM_STR);
+            $consulta->execute();
+
+            return $consulta->fetchAll(PDO::FETCH_CLASS, 'PedidoProducto');
+        }
     
         public static function modificar($pedidoProducto){
             // var_dump($pedidoProducto);
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccessoDB->retornarConsulta("UPDATE pedidos_productos SET codPedido = :codPedido,estado = :estado,
-            tiempoEstimado = :tiempoEstimado, idEmpleado = :idEmpleado, idProducto = :idProducto
-            WHERE idPedido = :id");
+            $consulta = $objAccessoDB->retornarConsulta("UPDATE pedidos_productos SET codPedido = :codPedido, estado = :estado,
+            tiempoEstimado = :tiempoEstimado, idProducto = :idProducto, idEmpleado = :idEmpleado
+            WHERE id = :id");
             $consulta->bindValue(':codPedido', $pedidoProducto->getCodPedido(), PDO::PARAM_STR);
             $consulta->bindValue(':estado', $pedidoProducto->getEstado(), PDO::PARAM_STR);
-            $consulta->bindValue(':tiempoEstimado', $pedidoProducto->getTiempoEstimado());
+            $consulta->bindValue(':tiempoEstimado', $pedidoProducto->getTiempoEstimado(), PDO::PARAM_STR);
             $consulta->bindValue(':idProducto', $pedidoProducto->getIdProducto(), PDO::PARAM_INT);
             $consulta->bindValue(':idEmpleado', $pedidoProducto->getIdEmpleado(), PDO::PARAM_INT);
+            $consulta->bindValue(':id', $pedidoProducto->getID(), PDO::PARAM_INT);
 
             $consulta->execute();
         }

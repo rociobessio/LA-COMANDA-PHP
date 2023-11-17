@@ -11,7 +11,7 @@
         public $estado;//“pendiente”,“en preparación”,“listo para servir”,
         public $tiempoEstimadoPreparacion;
         public $tiempoInicio;//-->Cuando inicia
-        public $tiempoFin;//-->se queda
+        public $tiempoFin;//-->Cuando termina de prepararse.
         public $idMesa;
         public $fotoMesa;
         public $pedidoFacturado;//-->false no se facturo aun, true si.
@@ -135,6 +135,23 @@
             $consulta = $objAccessoDB->retornarConsulta("SELECT idPedido,estado,tiempoEstimadoPreparacion,tiempoInicio,tiempoFin,idMesa,fotoMesa,
             nombreCliente,codigoPedido,pedidoFacturado FROM pedidos WHERE idPedido = :valor");
             $consulta->bindValue(':valor', $valor, PDO::PARAM_INT);
+            $consulta->execute();
+
+            return $consulta->fetchObject('Pedido');
+        }
+
+        /**
+         * Me permtiria obtener un pedido mediante
+         * su codigo de pedido.
+         * 
+         * @param string $codPedido el codigo del
+         * pedido.
+         */
+        public static function obtenerUnoPorCodigoPedido($codPedido){
+            $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
+            $consulta = $objAccessoDB->retornarConsulta("SELECT idPedido,estado,tiempoEstimadoPreparacion,tiempoInicio,tiempoFin,idMesa,fotoMesa,
+            nombreCliente,codigoPedido,pedidoFacturado FROM pedidos WHERE codigoPedido = :codPedido");
+            $consulta->bindValue(':codPedido', $codPedido, PDO::PARAM_STR);
             $consulta->execute();
 
             return $consulta->fetchObject('Pedido');
