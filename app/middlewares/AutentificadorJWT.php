@@ -1,5 +1,5 @@
 <?php
-use Firebase\JWT\JWT;
+    use Firebase\JWT\JWT;
 
 
     class AutentificadorJWT{

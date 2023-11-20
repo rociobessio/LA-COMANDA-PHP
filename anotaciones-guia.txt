@@ -27,26 +27,6 @@ y que la mesa no este con estado 'BAJA'.
 
 -> Si no pago se pueden agregar items
 
-->Al hacer el insert se relaciona el pedido de la tabla Producto-Pedido
-con n cantidad de productos.
-
--> De pedido se deberia de sacar idProducto, cantidad, idEmpleado
-idEmpleado deberia de ir en producto que es el responsable de crearlo?
-
-->pedido varios productos son distintas request llegan distintos pedidos,,
-
-->pedidos estado y tabla intermedia
-
-reuqest epdidio:
-trae toda info del pedio, con array d productos solicitados
-
-se verifica que existen
-
-se da de alta el pedido y obtiene el cod alfanumerico, el estimado 
-del pedio es en base al grupo relacionado del array
-
-se inserta en la tabla intermedia el cod de pedido, id prod, estado
-
 UPDATE DE ESTADOS: recibe el cod de pedido y el idProd,
 modificara su estado en la tabla intermedia y se cambia el estado del pedio
 
@@ -73,23 +53,18 @@ mayor tiempo d preparacion
 ->prod tiene el estimado de tiempo
 
 ===============================================================================
+Ver bien la demora de pedidos porq deberia tirar el estimado de demora no el estimad
+de tiempo? 
+
 DE LOS PDFS QUEDA POR HACER:
-Cada empleado responsable de cada producto del pedido , debe:
-❏ Listar todos los productos pendientes de este tipo de empleado.
-
-❏ El cliente ingresa el código de la mesa junto con el número de pedido y ve el tiempo de
-demora de su pedido.
-❏ 5- Alguno de los socios pide el listado de pedidos y el tiempo de demora de ese pedido.
-❏ 6- Cada empleado responsable de cada producto del pedido, debe:
-❏ Listar todos los productos pendientes de este tipo de empleado
-
 ❏ La moza cobra la cuenta.
 ❏ 10- Alguno de los socios cierra la mesa.
 ❏ 11- El cliente ingresa el código de mesa y el del pedido junto con los datos de la encuesta.
 ❏ 12- Alguno de los socios pide los mejores comentarios
 ❏ 13- Alguno de los socios pide la mesa más usada.
 
-Y TODA LA PARTE DE ADMINISTRADOR!
+Y TODA LA PARTE DE ADMINISTRADOR/CIRCUITO DE UN PEDIDO (ENCUESTAS, FACTURACIONES Y CIERRE DE MESA)!
+Ver mostrar mesas mas usadas y listar pedidos listos.
 
 ================================================================================
                                     CORRECCIONES:

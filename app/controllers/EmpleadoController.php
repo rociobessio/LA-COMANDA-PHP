@@ -111,12 +111,15 @@
             $clave = $parametros['clave'];
 
             $empleado = Empleado::obtenerUnoPorUsuario($nombre,$clave);
-            $data = array('empleado' => $empleado->getNombre(), 'rol' => $empleado->getRol(), 'clave' => $empleado->getClave(), 'id' =>$empleado->getIDEmpleado());
-            $creacionToken = AutentificadorJWT::CrearToken($data);
-
-            $response = $response->withHeader('Set-Cookie', 'token=' . $creacionToken['jwt']);
-
-            $payload = json_encode(array("mensaje" => "Usuario logueado correctamente", "token" => $creacionToken['jwt']));
+            if($empleado){
+                $data = array('empleado' => $empleado->getNombre(), 'rol' => $empleado->getRol(), 'clave' => $empleado->getClave(), 'id' =>$empleado->getIDEmpleado());
+                $creacionToken = AutentificadorJWT::CrearToken($data);
+                
+                $response = $response->withHeader('Set-Cookie', 'token=' . $creacionToken['jwt']);
+                
+                $payload = json_encode(array("mensaje" => "Usuario logueado correctamente", "token" => $creacionToken['jwt']));
+            }
+            else{$payload = json_encode(array("mensaje" => "Error al loguear el empleado"));}
 
             $response->getBody()->write($payload);
             return $response
@@ -159,4 +162,5 @@
                 return $response->withHeader('Content-Type', 'text/csv');
             }
         }
+
     }

@@ -206,9 +206,10 @@
             
             foreach ($pedidosProductos as $pedidoProducto) {
                 //-->Valido que el estado sea pendiente de ese pedido y que el sector del producto coincida
-                //con el sector del que inicia el pedido:
+                //con el sector del que inicia el pedido, ademas valido que no haya sido facturado aun:
                 if($pedidoProducto->getEstado() == "pendiente" &&
-                Producto::obtenerUno($pedidoProducto->getIdProducto())->getSector() == Producto::ValidarPedido($data->rol)){
+                Producto::obtenerUno($pedidoProducto->getIdProducto())->getSector() == Producto::ValidarPedido($data->rol)
+                && !$pedido->getPedidoFacturado()){
                     // echo 'entre';
                     $pedido->setTiempoInicio($tiempoInicio->format('H:i:sa'));//-->Al pedido le asigno el tiempo de inicio
                     $pedido->setEstado("En preparacion");
@@ -252,9 +253,13 @@
             //-->Me traigo el array relacionado a la tabla intermedia y el pedido
             $pedidosProductos = PedidoProducto::obtenerTodosLosPedidos($idPedidoProducto);
             $pedido = Pedido::obtenerUnoPorCodigoPedido($idPedidoProducto);
+            // var_dump($idPedidoProducto);
             $tiempoFinalizacion = new DateTime();
 
-            if($pedidosProductos){
+            // var_dump($pedido);
+            
+
+            if($pedidosProductos && ($pedido !== false)){
             //-->Recorro la tabla intermedia y cambio el estado, 
             //me fijo que el estado del producto en el pedido al menos sea "En preparacion" y el rol del empleado
             //-->El tiempo de finalizacion de un pedido se asigna cuando termino el producto o todos estan finalizados
@@ -263,8 +268,9 @@
                     Producto::obtenerUno($pedidoProducto->getIdProducto())->getSector() == Producto::ValidarPedido($data->rol)){
                         $pedido->setTiempoFin($tiempoFinalizacion->format('H:i:sa'));//-->Setteo el tiempo de finalizacion
                         $pedido->setEstado("listo para servir");
-
                         Pedido::modificar($pedido);//-->Lo modifico
+                        
+
 
                         //-->En la tabla intermedia cambio el estado y asigno el id del empleado a cargo
                         $pedidoProducto->setEstado("listo para servir");
@@ -312,15 +318,21 @@
             //-->Me traigo el array relacionado a la tabla intermedia y el pedido
             $pedidosProductos = PedidoProducto::obtenerTodosLosPedidos($idPedidoProducto);
             $pedido = Pedido::obtenerUnoPorCodigoPedido($idPedidoProducto);
-            $mesa = Mesa::obtenerUno($pedido->getIdMesa());
 
+            var_dump($pedido);
+            
             //-->Para entregar un pedido tendria que validar que todos los productos
-            //asignados a un pedido esten listos para servir
-            if($pedidosProductos){
+            //asignados a un pedido esten listos para servir, y el unico que lo entrega es el MOZO
+            if($pedidosProductos && ($pedido !== false)){
+                $mesa = Mesa::obtenerUno($pedido->getIdMesa());
                 //-->Valido que todos los productos esten listos para servir.
                 $todosListosParaServir = true;
                 foreach ($pedidosProductos as $pedidoProd) {
-                    if ($pedidoProd->getEstado() != "listo para servir") {
+                    //-->Es decir verifico que los productos esten listos para servir o entregados,
+                    //si es entregado, querria decir que el cliente ya termino con lo ordenado
+                    //y esto lo pidio despues, ejemplo: postre.
+                    if ($pedidoProd->getEstado() != "listo para servir" ||
+                        $pedidoProd->getEstado() != "entregado") {
                         $todosListosParaServir = false;
                         break;
                     }
@@ -339,7 +351,7 @@
                     }
 
                     //-->Cambio el estado de la mesa
-                    if($mesa && $mesa->getEstado() == "con cliente esperando pedido"){
+                    if($mesa !== false && $mesa->getEstado() == "con cliente esperando pedido"){
                         $mesa->setEstado("con cliente comiendo");
                         Mesa::modificar($mesa);
                     }
@@ -363,17 +375,17 @@
          *  demora de su pedido.
          */
         public static function ConsultarDemoraPedido($request,$response,$args){
-            $parametros = $request->getQueryParams();
+            $codMesa = $args['codMesa'] ?? null;
+            $codPedido = $args['codPedido'] ?? null;
             
-            if(isset($parametros['idMesa']) && isset($parametros['idPedido'])){
-                $idMesa = intval($parametros['idMesa']);
-                $codigoPedido = $parametros['codPedido'];//-->Es el alfanumerico
-                $listaPedidos = Pedido::ObtenerDemoraPedido($idMesa,$codigoPedido);
+            // if(isset($parametros['idMesa']) && isset($parametros['codPedido'])){
+                $codigoPedido = $codPedido;//-->Es el alfanumerico
+                $listaPedidos = Pedido::ObtenerDemoraPedido($codMesa,$codigoPedido);
                 if(count($listaPedidos) > 0){
                     $payload = json_encode(array("Pedidos" => $listaPedidos));
                     $response->getBody()->write($payload);
-                }
-                else{$response->getBody()->write("No hay concordancia de pedido y mesa ingresados.");}
+                // }
+                // else{$response->getBody()->write("No hay concordancia de pedido y mesa ingresados.");}
 
             }
             else{$response->getBody()->write("Se deben de ingresar todos los campos.");}
@@ -387,17 +399,17 @@
          */
         public static function ConsultarPedidosPendientes($request, $response, $args)
         {
-            $parametros = $request->getQueryParams();//-->Directamente del que ingreso 
-            $rol = isset($parametros['rol']) ? $parametros['rol'] : null;
-            var_dump($rol);
-            if ($rol !== null) {
-                $lista = Pedido::GetPedidosPendientes($rol);
-                if (count($lista) > 0) {
-                    $payload = json_encode(array("Pedidos" => $lista));
-                    $response->getBody()->write($payload);
-                } else {
-                    $response->getBody()->write("No se encontraron pedidos pendientes.");
-                }
+            //-->Obtengo el rol del empleado:
+            $header = $request->getHeaderLine(("Authorization"));
+            $token = trim(explode("Bearer", $header)[1]);
+            $data = AutentificadorJWT::ObtenerData($token);
+            // var_dump($rol);
+            $lista = Pedido::GetPedidosPendientes($data->rol);
+            if (count($lista) > 0) {
+                $payload = json_encode(array("Pedidos" => $lista));
+                $response->getBody()->write($payload);
+            } else {
+                $response->getBody()->write("No se encontraron pedidos pendientes para el rol: " . $data->rol);
             }
 
             return $response->withHeader('Content-Type', 'application/json');

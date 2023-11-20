@@ -20,6 +20,7 @@ require_once "./middlewares/Logger.php";
 
 require_once './db/accesoDB.php'; 
 require_once './controllers/PedidoController.php';
+require_once './controllers/FacturacionController.php';
 require_once './controllers/EmpleadoController.php';
 require_once './controllers/ProductoController.php';
 require_once "./controllers/MesaController.php"; 
@@ -57,18 +58,18 @@ $app->group('/productos',function (RouteCollectorProxy $group){
 
 // -->Empleados
 $app->group('/empleados',function (RouteCollectorProxy $group){
-    $group->get('[/]',\EmpleadoController::class . '::TraerTodos')->add(new MWSocios());
-    $group->get('/exportarCSV', \EmpleadoController::class . '::ExportarEmpleados')->add(new MWSocios());
-    $group->post('/importarCSV', \EmpleadoController::class . '::ImportarEmpleados')->add(new MWSocios())->add(\CSV::class . '::ValidarArchivo');
-    $group->get('/{id}',\EmpleadoController::class . '::TraerUno')->add(new MWSocios());
-    $group->post('[/]', \EmpleadoController::class . '::CargarUno')->add(new MWSocios());
-    $group->put('/{id}', \EmpleadoController::class . '::ModificarUno')->add(new MWSocios());
-    $group->delete('/{id}', \EmpleadoController::class . '::BorrarUno')->add(new MWSocios());
-})->add(new MWToken());
+    $group->get('[/]',\EmpleadoController::class . '::TraerTodos');//->add(new MWSocios());
+    $group->get('/exportarCSV', \EmpleadoController::class . '::ExportarEmpleados');//->add(new MWSocios());
+    $group->post('/importarCSV', \EmpleadoController::class . '::ImportarEmpleados')->add(\CSV::class . '::ValidarArchivo');
+    $group->get('/{id}',\EmpleadoController::class . '::TraerUno');//->add(new MWSocios());
+    $group->post('[/]', \EmpleadoController::class . '::CargarUno');//->add(new MWSocios());
+    $group->put('/{id}', \EmpleadoController::class . '::ModificarUno');;////->add(new MWSocios());
+    $group->delete('/{id}', \EmpleadoController::class . '::BorrarUno');//->add(new MWSocios());
+})->add(new MWToken())->add(new MWSocios());
 
 // -->Pedidos
 $app->group('/pedidos',function (RouteCollectorProxy $group){
-    $group->get('/consultarDemoraPedido/{idMesa,codPedido}', \PedidoController::class . '::ConsultarDemoraPedido');//->add(new MWPreparador());
+    $group->get('/consultarDemoraPedido[/{codMesa}[/{codPedido}]]', \PedidoController::class . '::ConsultarDemoraPedido');//->add(new MWPreparador());
     $group->get('[/]',\PedidoController::class . '::TraerTodos')->add(new MWSocios());
     $group->get('/{id}',\PedidoController::class . '::TraerUno')->add(new MWMozos());
     $group->post('[/]', \PedidoController::class . '::CargarUno')->add(new MWMozos());
@@ -76,11 +77,21 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->delete('/{id}', \PedidoController::class . '::BorrarUno')->add(new MWMozos());
     $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido')->add(new MWPreparador());
     $group->post('/finalizar/{id}', \PedidoController::class . '::FinalizarPedido')->add(new MWPreparador());
-    $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido')->add(new MWMozos());
+    $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido')->add(new MWMozos());//-->Solo el mozo podrá entregar el pedido
     $group->get('/consultarPedidosPendientes/[/]', \PedidoController::class . '::ConsultarPedidosPendientes')->add(new MWPreparador());
 })->add(new MWToken());
 
-//-->Tabla intermedia Pedido-Producto
+//-->Facturaciones
+$app->group('/facturaciones',function (RouteCollectorProxy $group){
+    $group->get('[/]',\FacturacionController::class . '::MostrarFacturas')->add(new MWSocios());
+})->add(new MWToken());
+
+//-->Encuestas
+// $app->group('/encuestas',function (RouteCollectorProxy $group){
+//     $group->get('[/]',\EncuestaController::class . '::MostrarMejores')->add(new MWSocios());
+//     $group->get('[/]',\EncuestaController::class . '::TraerTodos')->add(new MWSocios());
+// })->add(new MWToken());
+
 
 //-->Login para conseguir token
 $app->group('/login', function (RouteCollectorProxy $group) {

@@ -6,10 +6,10 @@
     class Pedido implements ICrud{
 //********************************************** ATRIBUTOS *************************************************************        
         public $idPedido;
-        public $codigoPedido;
+        public $codPedido;
         public $nombreCliente; 
         public $estado;//“pendiente”,“en preparación”,“listo para servir”,
-        public $tiempoEstimadoPreparacion;
+        public $tiempoEstimado;
         public $tiempoInicio;//-->Cuando inicia
         public $tiempoFin;//-->Cuando termina de prepararse.
         public $idMesa;
@@ -17,7 +17,7 @@
         public $pedidoFacturado;//-->false no se facturo aun, true si.
         public $costoTotal;
 //********************************************** GETTERS *************************************************************        
-        public function getIDPedido(){
+        public function getIdPedido(){
             return $this->idPedido;
         }
         public function getNombreCliente(){
@@ -27,7 +27,7 @@
             return $this->estado;
         }
         public function getTiempoEstimadoPreparacion(){
-            return $this->tiempoEstimadoPreparacion;
+            return $this->tiempoEstimado;
         }
         public function getTiempoInicio(){
             return $this->tiempoInicio;
@@ -45,7 +45,7 @@
             return $this->costoTotal;
         }
         public function getCodigoPedido(){
-            return $this->codigoPedido;
+            return $this->codPedido;
         }
         public function getPedidoFacturado(){
             return $this->pedidoFacturado;
@@ -67,13 +67,13 @@
             }
         } 
         public function setEstado($estado){
-            if(isset($estado)){
+            if(isset($estado) &&  !empty($estado)){
                 $this->estado = $estado;
             }
         }
         public function setTiempoEstimado($tiempoEstimado){
             if(isset($tiempoEstimado)){
-                $this->tiempoEstimadoPreparacion = $tiempoEstimado;
+                $this->tiempoEstimado = $tiempoEstimado;
             }
         }
         public function setTiempoInicio($tiempoInicio){
@@ -93,7 +93,7 @@
         }
         public function setCodigoPedido($codigoPedido){
             if(isset($codigoPedido)){
-                $this->codigoPedido = $codigoPedido;
+                $this->codPedido = $codigoPedido;
             }
         } 
         public function setPedidoFacturado($facturado){
@@ -158,13 +158,12 @@
         }
 
         public static function modificar($pedido){
-            // var_dump($pedido);
+            var_dump($pedido);
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccessoDB->retornarConsulta("UPDATE pedidos SET codigoPedido = :codigoPedido, fotoMesa = :fotoMesa,
+            $consulta = $objAccessoDB->retornarConsulta("UPDATE pedidos SET fotoMesa = :fotoMesa,
             idMesa = :idMesa, nombreCliente = :nombreCliente, estado = :estado, tiempoEstimadoPreparacion = :tiempoEstimadoPreparacion,
             tiempoInicio = :tiempoInicio,tiempoFin = :tiempoFin, pedidoFacturado = :pedidoFacturado, costoTotal = :costoTotal WHERE idPedido = :id");
-            $consulta->bindValue(':id', $pedido->getIDPedido(), PDO::PARAM_INT);
-            $consulta->bindValue(':codigoPedido', $pedido->getCodigoPedido(), PDO::PARAM_STR);
+            $consulta->bindValue(':id', $pedido->getIdPedido(), PDO::PARAM_INT);
             $consulta->bindValue(':fotoMesa', $pedido->getFotoMesa(), PDO::PARAM_STR);
             $consulta->bindValue(':idMesa', $pedido->getIDMesa(), PDO::PARAM_INT);
             $consulta->bindValue(':nombreCliente', $pedido->getNombreCliente(), PDO::PARAM_STR);
@@ -191,43 +190,58 @@
         }
 
         /**
-         * @param int $idMesa el id de la mesa.
+         * Me permtira obtener la demora de los pedidos
+         * de una mesa
+         * @param int $codigoMesa el codigo de la mesa.
          * @param string $codigoPedido el codigo
          * del pedido a buscar.
          */
-        public static function ObtenerDemoraPedido($idMesa, $codigoPedido){
+        public static function ObtenerDemoraPedido($codigoMesa, $codigoPedido) {
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
+            // var_dump($codigoMesa);
+            // var_dump($codigoPedido);
             $consulta = $objAccessoDB->retornarConsulta("
                 SELECT 
-                    p.tiempoEstimado AS demoraEstimada,
+                    pp.tiempoEstimado AS demoraEstimada,
                     p.estado AS estadoPedido,
                     pr.nombre AS nombreProducto
-                FROM pedidos AS p
-                INNER JOIN productos AS pr ON p.idProducto = pr.idProducto
-                WHERE p.idMesa = :idMesa AND p.codigoPedido = :codigoPedido
+                FROM pedidos_productos AS pp
+                INNER JOIN pedidos AS p ON pp.codPedido = p.codigoPedido
+                INNER JOIN productos AS pr ON pp.idProducto = pr.idProducto
+                INNER JOIN mesas AS m ON p.idMesa = m.idMesa
+                WHERE m.codigoMesa = :codigoMesa AND p.codigoPedido = :codigoPedido
             ");
-            $consulta->bindValue(':idMesa', $idMesa, PDO::PARAM_INT);
+            $consulta->bindValue(':codigoMesa', $codigoMesa, PDO::PARAM_STR);
             $consulta->bindValue(':codigoPedido', $codigoPedido, PDO::PARAM_STR);
             $consulta->execute();
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'stdClass');
         }
         
+        
+        
         /**
-         * Listar los pedidos pendientes del tipo de empleado
+         * Listar los pedidos pendientes del tipo de empleado.
          */
         public static function GetPedidosPendientes($rol)
         {
             $sector = Producto::ValidarPedido($rol);
 
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccessoDB->retornarConsulta("SELECT pedidos.*
-            FROM pedidos
-            INNER JOIN productos ON pedidos.idProducto = productos.idProducto
-            WHERE pedidos.estado = :estado AND productos.sector = :sector");
+            $consulta = $objAccessoDB->retornarConsulta("
+                SELECT pedidos_productos.id, 
+                    pedidos_productos.codPedido, 
+                    pedidos_productos.idProducto, 
+                    pedidos_productos.tiempoEstimado, 
+                    pedidos_productos.estado, 
+                    pedidos_productos.idEmpleado
+                FROM pedidos_productos
+                INNER JOIN productos ON pedidos_productos.idProducto = productos.idProducto
+                WHERE pedidos_productos.estado = :estado AND productos.sector = :sector
+            ");
             $consulta->bindValue(':estado', "pendiente");
             $consulta->bindValue(':sector', $sector );
             $consulta->execute();
-            return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+            return $consulta->fetchAll(PDO::FETCH_CLASS, 'PedidoProducto');
         }
 
         /**

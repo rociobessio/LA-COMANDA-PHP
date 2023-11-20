@@ -9,7 +9,7 @@
         public $sector;
         public $precio;
         public $tipo;
-        //-->tiempo 
+        //-->tiempo de preparacion para el producto
         public $tiempoEstimado;
 //********************************************** GETTERS *************************************************************
         public function getNombre(){
