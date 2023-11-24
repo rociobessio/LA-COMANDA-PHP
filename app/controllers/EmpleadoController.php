@@ -20,7 +20,7 @@
             $nombre = $parametros['nombre'];
             $rol = $parametros['rol'];
             $clave = $parametros['clave'];
-            var_dump($rol);
+            // var_dump($rol);
             
             if(in_array($rol,self::$roles)){
                 $empleado = new Empleado();

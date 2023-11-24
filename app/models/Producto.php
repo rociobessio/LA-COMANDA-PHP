@@ -139,7 +139,7 @@
                 case "Bartender":
                     $sector = "Vinoteca";
                     break;
-                case "Cervecero":
+                case "Cervezero":
                     $sector = "Cerveceria";
                     break;
                 case "Cocinero":

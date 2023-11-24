@@ -6,10 +6,10 @@
     class Pedido implements ICrud{
 //********************************************** ATRIBUTOS *************************************************************        
         public $idPedido;
-        public $codPedido;
+        public $codigoPedido;
         public $nombreCliente; 
         public $estado;//“pendiente”,“en preparación”,“listo para servir”,
-        public $tiempoEstimado;
+        public $tiempoEstimadoPreparacion;
         public $tiempoInicio;//-->Cuando inicia
         public $tiempoFin;//-->Cuando termina de prepararse.
         public $idMesa;
@@ -27,7 +27,7 @@
             return $this->estado;
         }
         public function getTiempoEstimadoPreparacion(){
-            return $this->tiempoEstimado;
+            return $this->tiempoEstimadoPreparacion;
         }
         public function getTiempoInicio(){
             return $this->tiempoInicio;
@@ -45,7 +45,7 @@
             return $this->costoTotal;
         }
         public function getCodigoPedido(){
-            return $this->codPedido;
+            return $this->codigoPedido;
         }
         public function getPedidoFacturado(){
             return $this->pedidoFacturado;
@@ -73,7 +73,7 @@
         }
         public function setTiempoEstimado($tiempoEstimado){
             if(isset($tiempoEstimado)){
-                $this->tiempoEstimado = $tiempoEstimado;
+                $this->tiempoEstimadoPreparacion = $tiempoEstimado;
             }
         }
         public function setTiempoInicio($tiempoInicio){
@@ -93,7 +93,7 @@
         }
         public function setCodigoPedido($codigoPedido){
             if(isset($codigoPedido)){
-                $this->codPedido = $codigoPedido;
+                $this->codigoPedido = $codigoPedido;
             }
         } 
         public function setPedidoFacturado($facturado){
@@ -158,7 +158,7 @@
         }
 
         public static function modificar($pedido){
-            var_dump($pedido);
+            // var_dump($pedido);
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccessoDB->retornarConsulta("UPDATE pedidos SET fotoMesa = :fotoMesa,
             idMesa = :idMesa, nombreCliente = :nombreCliente, estado = :estado, tiempoEstimadoPreparacion = :tiempoEstimadoPreparacion,
@@ -201,8 +201,8 @@
             // var_dump($codigoMesa);
             // var_dump($codigoPedido);
             $consulta = $objAccessoDB->retornarConsulta("
-                SELECT 
-                    pp.tiempoEstimado AS demoraEstimada,
+                    SELECT 
+                    TIMEDIFF(pp.tiempoEstimado, p.tiempoInicio) AS demora,
                     p.estado AS estadoPedido,
                     pr.nombre AS nombreProducto
                 FROM pedidos_productos AS pp
@@ -216,8 +216,6 @@
             $consulta->execute();
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'stdClass');
         }
-        
-        
         
         /**
          * Listar los pedidos pendientes del tipo de empleado.

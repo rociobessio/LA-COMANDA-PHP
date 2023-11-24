@@ -127,7 +127,7 @@
             $consulta->bindValue(':id', $empleado->getIDEmpleado(), PDO::PARAM_INT);
             $consulta->bindValue(':nombre', $empleado->getNombre(), PDO::PARAM_STR);
             $consulta->bindValue(':rol', $empleado->getRol(), PDO::PARAM_STR);
-            $consulta->bindValue(':rol', $empleado->getClave(), PDO::PARAM_STR);
+            $consulta->bindValue(':clave', $empleado->getClave(), PDO::PARAM_STR);
             // $consulta->bindValue(':fechaAlta', $empleado->getFechaAlta(), PDO::PARAM_INT);
             // $consulta->bindValue(':fechaBaja', $empleado->getFechaBaja(), PDO::PARAM_STR);
             return $consulta->execute();

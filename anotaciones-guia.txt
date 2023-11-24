@@ -63,13 +63,37 @@ DE LOS PDFS QUEDA POR HACER:
 ❏ 12- Alguno de los socios pide los mejores comentarios
 ❏ 13- Alguno de los socios pide la mesa más usada.
 
+-> Las mesas tienen un código de identificación único (de 5 caracteres) , el cliente al entrar en
+nuestra aplicación puede ingresar ese código junto con el número del pedido y se le mostrará el
+tiempo restante para su pedido.
+
+-> LISTADO - EMPLEADOS (fecha logueo - cant. operaciones - suspensión - borrado),
+es decir, tendria que agregar cant operaciones. Pero en realidad las voy sumando a medida
+que van modificando los pedidos.
+
+-> Al terminar de comer se habilita una encuesta con una puntuación del 1 al 10 para:
+● La mesa.
+● El restaurante.
+● El mozo.
+● El cocinero.
+Y un breve texto de hasta 66 caracteres describiendo la experiencia (buena o mala) que tuvo en su
+atención
+
 Y TODA LA PARTE DE ADMINISTRADOR/CIRCUITO DE UN PEDIDO (ENCUESTAS, FACTURACIONES Y CIERRE DE MESA)!
 Ver mostrar mesas mas usadas y listar pedidos listos.
 
-================================================================================
+================================================================================>
                                     CORRECCIONES:
 -> El metodo ConsultarDemoraPedido en PedidoController.php no funciona.
 
+QUEDA POR HACER:
+-> El circuito del pedido ->se toma ->se inicia ->se finaliza ->se entrega.
+-> El circuito de cobro ->se ve la cuenta de la mesa ->se cobra/factura ->se vuelve a cerrar la mesa
+-> Se deberia de hacer la encuesta a un cliente.
+-> La facturacion como se plantea.
+
+->El ConsultarDemoraPedidoCliente toma mal el tiempo de demora da negativo y no es el caso.
+->Ademas me muestra el estado del pedido en general y yo quisiera el estado de la tabla intermedia.
 
 
  

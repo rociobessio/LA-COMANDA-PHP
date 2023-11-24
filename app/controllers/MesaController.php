@@ -6,7 +6,7 @@
     class MesaController extends Mesa implements IApiUsable{
 
         //-->Los estados de la mesa pueden ser:
-        public static $estados = array("con cliente esperando pedido", "con cliente comiendo", "con cliente pagando", "cerrada",);
+        public static $estados = array("con cliente esperando pedido", "con cliente comiendo", "con cliente pagando", "pagado" ,"cerrada",);
 
         public static function CargarUno($request, $response, $args)
         {
@@ -111,24 +111,113 @@
          * 
          * La moza se fija los pedidos que están listos para servir , cambia el estado de la mesa,
          */
-        public static function CambiarEstadoMesa($request, $response, $args)
-        {
-            $parametros = $request->getParsedBody();
-            $mesa = Mesa::obtenerUno(intval($parametros['idMesa']));
-            echo 'aca';
-            $listaPedidos = Pedido::obtenerPedidosListos();
-            var_dump($listaPedidos);
-            foreach ($listaPedidos as $pedido)
-            {
-                if($pedido->getIdMesa() == $mesa->getIdMesa() && $pedido->getEstado() == "listo para servir")
-                {
-                    $mesa->setEstado( "con cliente comiendo");
-                    // var_dump($mesa);
+        // public static function CambiarEstadoMesa($request, $response, $args)
+        // {
+        //     $parametros = $request->getParsedBody();
+        //     $mesa = Mesa::obtenerUno(intval($parametros['idMesa']));
+        //     $pudoCambiar = false;
+        //     // echo 'aca';
+        //     $listaPedidos = Pedido::obtenerPedidosListos();
+        //     // var_dump($listaPedidos);
+        //     foreach ($listaPedidos as $pedido)
+        //     {   //-->Solo se podrá cambiar el estado si hay coincidencias de id's y el pedido fue entregado.
+        //         if($pedido->getIdMesa() == $mesa->getIdMesa() && $pedido->getEstado() == "listo para servir")
+        //         {
+        //             $mesa->setEstado( "con cliente comiendo");
+        //             // var_dump($mesa);
+        //             Mesa::modificar($mesa);
+        //             $pedido->setEstado("entregado");
+        //             Pedido::modificar($pedido);//-->Modifico el pedido.
+        //             $response->getBody()->write("Se ha modificado el estado de la mesa con exito!\n");
+        //             $pudoCambiar = true;
+        //             break;
+        //         }
+        //     }
+
+        //     if($pudoCambiar){//-->Cambia el estado de la tabla intermedia.
+        //         $pedidoProductos = PedidoProducto::obtenerTodosLosPedidos($pedido->getCodigoPedido());
+        //         foreach($pedidoProductos as $pedProd){
+        //             if($pedido->getCodigoPedido() && $pedProd->getCodPedido()){
+        //                 $pedProd->setEstado("entregado");
+        //                 PedidoProducto::modificar($pedProd);
+        //             }
+        //         }
+        //     }
+
+        //     if(!$pudoCambiar){
+        //         $response->getBody()->write("Para cambiar el estado de la mesa el pedido debe ser entregado!\n");
+        //     }
+        //     return $response->withHeader('Content-Type', 'application/json');
+        // }
+
+        /**
+         * Me permitira cobrar una mesa.
+         * 
+         * La moza cobra la cuenta.
+         * 
+         * Cambio el estado de la mesa
+         * y al pedido lo pongo como facturado.
+         */
+        public static function CobrarMesa($request, $response, $args){
+            $codPedido = $args['codPedido'];
+
+            $pedido = Pedido::obtenerUno($codPedido); 
+
+            if($pedido !== false){
+                $mesa = Mesa::obtenerUno($pedido->getIdMesa());
+                //-->Si esta pagando
+                if($mesa && $mesa->getEstado() === "con cliente pagando"){
+                    $cuenta = Mesa::ObtenerCuenta($codPedido);
+                    $mesa->setEstado(self::$estados[3]);//-->pagado
                     Mesa::modificar($mesa);
-                    $response->getBody()->write("Se ha modificado el estado de la mesa con exito!\n");
-                    break;
+
+                    $pedido->setPedidoFacturado(true);//-->Pongo el pedido como facturado
+                    Pedido::modificar($pedido);
+
+                    $response->getBody()->write("Se ha cobrado la mesa " . $cuenta[0]['idMesa']);
+                }
+                else{
+                    $response->getBody()->write("Ocurrio un error al querer cobrar la mesa!" );
                 }
             }
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+
+        /**
+         * Servira para cambiarle el estado a la
+         * mesa y que el estado de esta pase a estar
+         * "con cliente pagando", se le muestra el total
+         * del pedidos.
+         */
+        public static function MostrarCuentaMesa($request, $response, $args){
+            $codPedido = $args['codPedido'];
+            $pedido = Pedido::obtenerUno($codPedido); 
+            if($pedido){
+                $mesa = Mesa::obtenerUno($pedido->getIdMesa());
+                if($mesa){
+                    $cuenta = Mesa::ObtenerCuenta($codPedido);
+                    $mesa->setEstado(self::$estados[2]);//-->Con cliente pagando
+                    Mesa::modificar($mesa);
+
+                    $response->getBody()->write("El total del pedido es: " . $cuenta[0]['SUM(pr.precio)']);
+                }
+            }else{
+                $response->getBody()->write("Ocurrio un error al querer cobrar la mesa!" );
+            }
+
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+
+        /**
+         * Permitira que alguno de los socios
+         * cierren la mesa.
+         */
+        public static function CerrarMesa($request, $response, $args){
+            $parametros = $request->getParsedBody();
+            $mesa = Mesa::obtenerUno(intval($parametros['idMesa']));
+            $mesa->setEstado(self::$estados[4]);//-->Cerrada
+            Mesa::modificar($mesa);
+            $response->getBody()->write("Mesa cerrada con exito!");
             return $response->withHeader('Content-Type', 'application/json');
         }
 

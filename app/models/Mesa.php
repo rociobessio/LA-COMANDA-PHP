@@ -77,7 +77,7 @@
          * la coincidencia del ID.
          */
         public static function obtenerUno($value){
-            var_dump($value);
+            // var_dump($value);
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccessoDB->retornarConsulta("SELECT idMesa,codigoMesa,estado FROM mesas WHERE idMesa = :valor");
             $consulta->bindValue(':valor', $value, PDO::PARAM_INT);
@@ -110,6 +110,22 @@
             $consulta->bindValue(':id', $id, PDO::PARAM_INT);
             $consulta->bindValue(':estado', "BAJA", PDO::PARAM_STR);
             return $consulta->execute();
+        }
+
+        public static function ObtenerCuenta($codPedido){
+            $objAccesoDato = AccesoDatos::obtenerObjetoAcceso();
+            $consulta = $objAccesoDato->prepararConsulta(
+                "SELECT p.idMesa , SUM(pr.precio)
+                FROM pedidos as p
+                INNER JOIN productos as pr ON p.idProducto = pr.id
+                WHERE p.codigoPedido = :codigoPedido"
+            );
+
+            $consulta->bindValue(':codigoPedido', $codPedido, PDO::PARAM_STR);
+
+            $consulta->execute();
+
+            return $consulta->fetchAll(PDO::FETCH_ASSOC);
         }
         
 }
