@@ -17,9 +17,6 @@ Luego tirar en la raiz del proyecto composer update
 
 =============================================================================
                                 PEDIDOS:
-->Cuando haga un pedido deberia de chequear que no este dado de baja el proudcot
-y que la mesa no este con estado 'BAJA'.
-
 ->Cuando hago un ""borrar"" en pedido en realidad es la paga de este.
 
 -> Estados: Que no estarías cambiando el estado de un producto individual,
@@ -37,12 +34,6 @@ y cambiarle el estado tambien.
 
 =============================================================================
                                 PRODUCTO:  
--> Luego en PEDIDOS al poner el tiempo estimado de preparacion deberia
-de verificar entre TODOS los pedidos realizados por una mesa cual es el del 
-tiempo maximo (si es mas de 1 cantidad se multiplicara) y de asi saco el estimativo
-del tiempo de preparacion para un PEDIDO. Luego al pedido se le asignara el tiempo de
-finalizacion que es al entregarse.
-
 ->Producto debreia de tener tambien el tipo estimado de preparacion para
 luego calcular entre todos los productos de un mismo pedido se calcule el de
 mayor tiempo d preparacion 
@@ -63,9 +54,6 @@ DE LOS PDFS QUEDA POR HACER:
 ❏ 12- Alguno de los socios pide los mejores comentarios
 ❏ 13- Alguno de los socios pide la mesa más usada.
 
--> Las mesas tienen un código de identificación único (de 5 caracteres) , el cliente al entrar en
-nuestra aplicación puede ingresar ese código junto con el número del pedido y se le mostrará el
-tiempo restante para su pedido.
 
 -> LISTADO - EMPLEADOS (fecha logueo - cant. operaciones - suspensión - borrado),
 es decir, tendria que agregar cant operaciones. Pero en realidad las voy sumando a medida
@@ -87,7 +75,6 @@ Ver mostrar mesas mas usadas y listar pedidos listos.
 -> El metodo ConsultarDemoraPedido en PedidoController.php no funciona.
 
 QUEDA POR HACER:
--> El circuito del pedido ->se toma ->se inicia ->se finaliza ->se entrega.
 -> El circuito de cobro ->se ve la cuenta de la mesa ->se cobra/factura ->se vuelve a cerrar la mesa
 -> Se deberia de hacer la encuesta a un cliente.
 -> La facturacion como se plantea.
@@ -95,5 +82,14 @@ QUEDA POR HACER:
 ->El ConsultarDemoraPedidoCliente toma mal el tiempo de demora da negativo y no es el caso.
 ->Ademas me muestra el estado del pedido en general y yo quisiera el estado de la tabla intermedia.
 
+-> Las mesas tienen un código de identificación único (de 5 caracteres) , el cliente al entrar en
+nuestra aplicación puede ingresar ese código junto con el número del pedido y se le mostrará el
+tiempo restante para su pedido.
+
+->Deberia de chequear que cuando yo doy de alta un pedido quizas tomar su codigo ingresado
+o no, si esta setteado se agrega al pedido de una misma mesa, sino se genera un nuevo pedido.
+
+->Y sino, se puede crear otra funcion que sea agregar productos a pedido que a un pedido existente
+le agregue mas productos.
 
  

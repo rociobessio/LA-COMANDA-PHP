@@ -150,7 +150,7 @@
         public static function obtenerUnoPorCodigoPedido($codPedido){
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
             $consulta = $objAccessoDB->retornarConsulta("SELECT idPedido,estado,tiempoEstimadoPreparacion,tiempoInicio,tiempoFin,idMesa,fotoMesa,
-            nombreCliente,codigoPedido,pedidoFacturado FROM pedidos WHERE codigoPedido = :codPedido");
+            nombreCliente,codigoPedido,pedidoFacturado,costoTotal FROM pedidos WHERE codigoPedido = :codPedido");
             $consulta->bindValue(':codPedido', $codPedido, PDO::PARAM_STR);
             $consulta->execute();
 

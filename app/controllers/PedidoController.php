@@ -10,6 +10,9 @@
         //-->Estados disponibles para los pedidos.
         public static $estadosPedido = array("pendiente", "listo para servir", "en preparacion","entregado");
 
+        /**
+         * Me permitira generar un pedido desde cero.
+         */
         public static function CargarUno($request, $response, $args){ 
             $files = $request->getUploadedFiles();
 
@@ -94,6 +97,69 @@
                 $payload = json_encode(array("Mensaje" => "La mesa asignada no existe!"));
             }
     
+            $response->getBody()->write($payload);
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+
+        /**
+         * Me permitira agregar mas productos
+         * a un pedido existente.
+         * Por ejemplo; si ya pedi plato principal
+         * y luego quisiese agregar un postre.
+         * El unico que podra agregar es el mozo.
+        */
+        public static function AgregarProductosAPedido($request, $response, $args){
+            //-->Obtengo los productos y el codigo de pedido.
+            $codPedido = $args['codPedido'];
+            $parametros = $request->getParsedBody();
+            $productosRecibidos =  json_decode($parametros['productos'], true);
+            $pedido = Pedido::obtenerUnoPorCodigoPedido($codPedido);//-->Busco el pedido
+            $tiempoEstimado = 0;
+            $totalPedido = 0;
+            // var_dump($pedido);
+            if($pedido){
+                foreach ($productosRecibidos as $prod) {
+                    // echo "producto recibido:";
+                    // var_dump($prod);
+
+                    $productoExistente = Producto::obtenerUno($prod['idProducto']);
+                    //-->Busco que exista
+                    if($productoExistente !== false){//-->Quiere decir que existe
+                        if($productoExistente->getTiempoPreparacion() > $tiempoEstimado){
+                            $tiempoEstimado = $productoExistente->getTiempoPreparacion();//-->Almacena el tiempo estimado mayor
+                        }
+                        
+                        //-->Se acumulan los totales.
+                        $totalPedido += $productoExistente->getPrecio();
+                        
+                        $productos[] = $productoExistente;//-->Lo guardo en el array
+                    }
+                }
+
+                //-->Le sumo el nuevo valor: 
+                $costoTotal = $pedido->getCostoTotal() + $totalPedido; 
+                $pedido->setCostoTotal($costoTotal); 
+
+                $pedido->setTiempoEstimado($tiempoEstimado);
+                Pedido::modificar($pedido);
+
+                //-->Agrego los nuevos productos a la tabla intermedia:
+                foreach ($productos as $product) {
+                    // var_dump($product);
+                    $pedidoProducto = new PedidoProducto();
+                    $pedidoProducto->setCodPedido($pedido->getCodigoPedido());
+                    $pedidoProducto->setEstado(self::$estadosPedido[0]);
+                    $pedidoProducto->setTiempoEstimado($product->getTiempoPreparacion());
+                    $pedidoProducto->setIdProducto($product->getIdProducto());
+                    $pedidoProducto->setIdEmpleado(0);
+
+                    PedidoProducto::crear($pedidoProducto);
+                }
+                $payload = json_encode(array("Mensaje" => "Se han agregado productos al pedido, su codigo es: " . $pedido->getCodigoPedido()));
+            }
+            else{
+                $payload = json_encode(array("Mensaje" => "No existe un pedido con codigo: " . $codPedido ."!"));
+            }
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         }
@@ -187,12 +253,6 @@
             $token = trim(explode("Bearer", $header)[1]);
             $data = AutentificadorJWT::ObtenerData($token);
 
-            //-->Hay un problema que es que al hacer el rol y sector, si supuestamente,
-            //yo tengo un array de productos y un unico empleado es el que inicializa el pedido
-            //hay sectores y tipos que no coincidiran. Salvo que solo se tomen aquellos pedidos 
-            //relacionados al preparador y luego se van turnando para el resto de coincidencias.
-
-
             // var_dump($pedidosProductos);
             // var_dump($data);
 
@@ -285,7 +345,7 @@
                 // }
 
                 if ($pedidosProductos && ($pedido !== false)) {
-                    // Recorro la tabla intermedia y verifico el estado de cada producto
+                    //-->Recorro la tabla intermedia y verifico el estado de cada producto
                     foreach ($pedidosProductos as $pedidoProducto) {
                         if ($pedidoProducto->getEstado() == "En preparacion" ||
                             Producto::obtenerUno($pedidoProducto->getIdProducto())->getSector() == Producto::ValidarPedido($data->rol)) {
@@ -301,7 +361,7 @@
                     
                     //-->Solo cuando todos los pedidoProducto esten listos cambio el estado del pedido por completo
                     foreach($pedidosProductos as $pedidoProducto){
-                        if($pedidoProducto->getEstado() === "listo para servir" ||
+                        if($pedidoProducto->getEstado() === "listo para servir" &&
                             Producto::obtenerUno($pedidoProducto->getIdProducto())->getSector() === Producto::ValidarPedido($data->rol)) {
                             $pedido->setTiempoFin($tiempoFinalizacion->format('H:i:sa'));
                             $pedido->setEstado("listo para servir");
@@ -364,7 +424,7 @@
                     Pedido::modificar($pedido);
 
                     //-->Cambio el estado de la mesa 
-                    if($mesa !== false && $mesa->getEstado() == "con cliente esperando pedido"){
+                    if($mesa && $mesa->getEstado() == "con cliente esperando pedido"){
                         $mesa->setEstado("con cliente comiendo");
                         Mesa::modificar($mesa);
                     }
@@ -376,53 +436,9 @@
             }else {
                 $payload = json_encode(array("mensaje" => "ID no coinciden con ningun Pedido!"));
             }
-            
-            
-            //-->Para entregar un pedido tendria que validar que todos los productos
-            //asignados a un pedido esten listos para servir, y el unico que lo entrega es el MOZO
-            // if($pedidosProductos && ($pedido)){
-            //     $mesa = Mesa::obtenerUno($pedido->getIdMesa());
-            //     //-->Valido que todos los productos esten listos para servir.
-            //     $todosListosParaServir = true;
-            //     foreach ($pedidosProductos as $pedidoProd) {
-            //         //-->Es decir verifico que los productos esten listos para servir o entregados,
-            //         //si es entregado, querria decir que el cliente ya termino con lo ordenado
-            //         //y esto lo pidio despues, ejemplo: postre.
-            //         var_dump($pedidoProd);
-            //         if ($pedidoProd->getEstado() != "listo para servir" ||
-            //             $pedidoProd->getEstado() != "entregado") {
-            //             $todosListosParaServir = false;
-            //             break;
-            //         }
-            //     }
-
-            //     //-->Si lo estan modifico.
-            //     if($todosListosParaServir){
-            //         $pedido->setEstado("entregado");
-            //         Pedido::modificar($pedido);//-->Lo modifico
-
-            //         //-->Recorro en la tabla intermedia y cambio el estado
-            //         foreach ($pedidosProductos as $pedidoProd) {
-            //             $pedidoProd->setEstado("entregado");
-            //             // var_dump($pedidoProducto);
-            //             PedidoProducto::modificar($pedidoProd);
-            //         }
-
-            //         //-->Cambio el estado de la mesa
-            //         //-->El estado de la mesa se cambia luego
-            //         // if($mesa !== false && $mesa->getEstado() == "con cliente esperando pedido"){
-            //         //     $mesa->setEstado("con cliente comiendo");
-            //         //     Mesa::modificar($mesa);
-            //         // }
-
-            //         $entregado = true;
-            //     }
-
-                if($entregado){$payload = json_encode(array("mensaje" => "Pedido entregado al cliente!"));}
-                else{$payload = json_encode(array("mensaje" => "Error en querer entregar el pedido, es posible que aun no esten todos los productos disponible para servirse!"));}
-            // }else {
-            //     $payload = json_encode(array("mensaje" => "ID no coinciden con ningun Pedido!"));
-            // }
+ 
+            if($entregado){$payload = json_encode(array("mensaje" => "Pedido entregado al cliente!"));}
+            else{$payload = json_encode(array("mensaje" => "Error en querer entregar el pedido, es posible que aun no esten todos los productos disponible para servirse!"));}
 
             $response->getBody()->write($payload);
             return $response

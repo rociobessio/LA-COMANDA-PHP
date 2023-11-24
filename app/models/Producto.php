@@ -137,8 +137,8 @@
             switch ($rol)
             {
                 case "Bartender":
-                    $sector = "Vinoteca";
-                    break;
+                    $sector = "Barra";
+                break;
                 case "Cervezero":
                     $sector = "Cerveceria";
                     break;
@@ -147,6 +147,9 @@
                     break;
                 case "Candybar"://-->Pastelero no esta certificado en el enunciado
                     $sector = "CandyBar";
+                break;
+                case "Vinoteca":
+                    $sector = "Vinoteca";
                 break;
             }
             return $sector;

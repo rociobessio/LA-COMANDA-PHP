@@ -41,7 +41,7 @@ $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 //-->Mesas:
 $app->group('/mesas', function (RouteCollectorProxy $group) {
     $group->get('[/]',\MesaController::class . '::TraerTodos')->add(new MWSocios());
-    $group->put('/cambiarEstado', \MesaController::class . '::CambiarEstadoMesa')->add(new MWMozos());
+    // $group->put('/cambiarEstado', \MesaController::class . '::CambiarEstadoMesa')->add(new MWMozos());
     $group->get('/{id}',\MesaController::class . '::TraerUno')->add(new MWSocios());
     $group->post('[/]', \MesaController::class . '::CargarUno')->add(new MWSocios());
     $group->post('/cobrarMesa', \MesaController::class . '::CobrarMesa')->add(new MWMozos());//-->La moza cobra la mesa
@@ -78,6 +78,7 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->post('[/]', \PedidoController::class . '::CargarUno')->add(new MWMozos());
     $group->put('/{id}', \PedidoController::class . '::ModificarUno')->add(new MWMozos());
     $group->delete('/{id}', \PedidoController::class . '::BorrarUno')->add(new MWMozos());
+    $group->post('/agregarProductosPedido/{codPedido}', \PedidoController::class . '::AgregarProductosAPedido')->add(new MWMozos());
     $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido')->add(new MWPreparador());
     $group->post('/finalizar/{id}', \PedidoController::class . '::FinalizarPedido')->add(new MWPreparador());
     $group->post('/entregar/{id}', \PedidoController::class . '::EntregarPedido')->add(new MWMozos());//-->Solo el mozo podrá entregar el pedido
