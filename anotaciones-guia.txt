@@ -86,10 +86,8 @@ QUEDA POR HACER:
 nuestra aplicación puede ingresar ese código junto con el número del pedido y se le mostrará el
 tiempo restante para su pedido.
 
-->Deberia de chequear que cuando yo doy de alta un pedido quizas tomar su codigo ingresado
-o no, si esta setteado se agrega al pedido de una misma mesa, sino se genera un nuevo pedido.
+->Volver a ver todo el circuito  + agregar productos al pedido.
 
-->Y sino, se puede crear otra funcion que sea agregar productos a pedido que a un pedido existente
-le agregue mas productos.
+->Mesa mas usada.
 
  

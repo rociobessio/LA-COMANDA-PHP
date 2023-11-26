@@ -116,11 +116,11 @@
             $pedido = Pedido::obtenerUnoPorCodigoPedido($codPedido);//-->Busco el pedido
             $tiempoEstimado = 0;
             $totalPedido = 0;
-            // var_dump($pedido);
+            var_dump($pedido);
             if($pedido){
                 foreach ($productosRecibidos as $prod) {
-                    // echo "producto recibido:";
-                    // var_dump($prod);
+                    echo "producto recibido:";
+                    var_dump($prod);
 
                     $productoExistente = Producto::obtenerUno($prod['idProducto']);
                     //-->Busco que exista
@@ -347,7 +347,7 @@
                 if ($pedidosProductos && ($pedido !== false)) {
                     //-->Recorro la tabla intermedia y verifico el estado de cada producto
                     foreach ($pedidosProductos as $pedidoProducto) {
-                        if ($pedidoProducto->getEstado() == "En preparacion" ||
+                        if ($pedidoProducto->getEstado() == "En preparacion" &&
                             Producto::obtenerUno($pedidoProducto->getIdProducto())->getSector() == Producto::ValidarPedido($data->rol)) {
 
                             //-->En la tabla intermedia cambio el estado y asigno el id del empleado a cargo

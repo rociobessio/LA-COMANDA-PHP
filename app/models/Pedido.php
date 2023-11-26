@@ -202,7 +202,7 @@
             // var_dump($codigoPedido);
             $consulta = $objAccessoDB->retornarConsulta("
                     SELECT 
-                    TIMEDIFF(pp.tiempoEstimado, p.tiempoInicio) AS demora,
+                    TIMEDIFF(p.tiempoInicio,pp.tiempoEstimado) AS demora,
                     p.estado AS estadoPedido,
                     pr.nombre AS nombreProducto
                 FROM pedidos_productos AS pp
