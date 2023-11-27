@@ -37,6 +37,7 @@
             return $response
             ->withHeader('Content-Type','application/json');
         } 
+        
         public static function TraerTodos($request, $response, $args){
             $listado = Empleado::obtenerTodos();
             $payload = json_encode(array("Empleados" => $listado));
@@ -74,31 +75,32 @@
 
 	    public static function ModificarUno($request, $response, $args){
             $id = $args['id'];
-
+        
             $empleado = Empleado::obtenerUno(intval($id));
             if($empleado !== false){
                 $parametros = $request->getParsedBody();
-
-                if(isset($parametros['nombre']) && isset($parametros['rol']) && isset($parametros['clave'])){
-                        if(in_array($parametros['rol'],self::$roles)){
-                            $empleado->setNombre($parametros['nombre']);
-                            $empleado->setRol($parametros['rol']);
-                            $empleado->setClave($parametros['clave']);
-                            Empleado::modificar($empleado);
-                            $payload = json_encode(array("mensaje" => "El empleado se ha podido modificar correctamente!"));
-                        }
-                        else
-                            $payload = json_encode(array("mensaje" => "Rol ingresado no valido!"));
+                
+                if(isset($parametros['nombre'])){$empleado->setNombre($parametros['nombre']);}
+                if(isset($parametros['clave'])){$empleado->setClave($parametros['clave']);} 
+        
+                if(isset($parametros['rol'])){//-->Valido el rol
+                    if(in_array($parametros['rol'],self::$roles)){
+                        if(isset($parametros['rol'])){$empleado->setRol($parametros['rol']);}
                     }
-                else
-                    $payload = json_encode(array("mensaje" => "Se necesita el ingreso de todos los parametros!"));
+                    else{$payload = json_encode(array("mensaje" => "Rol ingresado no válido!")); }
+                }
+        
+                // var_dump($empleado);
+                Empleado::modificar($empleado);
+                $payload = json_encode(array("mensaje" => "El empleado se ha podido modificar correctamente!")); 
             }
             else
                 $payload = json_encode(array("mensaje" => "No hay coincidencia de empleado con ID:" . $id ." !"));
-
+        
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         }
+        
 
 //======================================== SPRINT III ===============================================================
         /**
