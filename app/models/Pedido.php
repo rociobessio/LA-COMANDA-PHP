@@ -229,8 +229,14 @@
                         return "El pedido ya deberia de finalizar, quedan: " . $restante . " minutos.";
                     }
                 }
-                elseif($pedido->getEstado === "pendiente"){
+                elseif($pedido->getEstado() === "pendiente"){
                     return "El pedido aún no se ha comenzado a preparar.";
+                }
+                elseif($pedido->getEstado() === "entregado"){
+                    return "El pedido ya fue entregado.";
+                }
+                else{
+                    return "El pedido se esta terminando de servir.";
                 }
             }
         }

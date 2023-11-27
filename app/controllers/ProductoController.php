@@ -97,25 +97,28 @@
             $producto = Producto::obtenerUno(intval($id));
             
             if($producto !== false){
-                $parametros = $request->getParsedBody();
-                if(isset($parametros['nombre']) && isset($parametros['sector']) && isset($parametros['precio']) &&
-                isset($parametros['tipo'])){
-                    if(in_array($parametros['sector'],self::$sectores) && in_array($parametros['tipo'],self::$tiposValidos)){
-                        //-->Paso las validaciones modifico:
-                        $producto->setNombre($parametros['nombre']);
-                        $producto->setSector($parametros['sector']);
-                        $producto->setTipo($parametros['tipo']);
-                        $producto->setPrecio(floatval($parametros['precio']));
+                $parametros = $request->getParsedBody(); 
 
-                        Producto::modificar($producto);
-                        
-                        $payload = json_encode(array("mensaje" => "Producto modificado correctamente!"));
+                if(isset($parametros['nombre'])){$producto->setNombre($parametros['nombre']);} 
+                if(isset($parametros['precio'])){$producto->setPrecio(floatval($parametros['precio']));} 
+
+                if(isset($parametros['sector'])){
+                    if(in_array($parametros['sector'],self::$sectores)){ 
+                        if(isset($parametros['sector'])){$producto->setSector($parametros['sector']);}  
                     }
                     else
-                        $payload = json_encode(array("Error"=>"No es un sector o tipo valido."));
+                    $payload = json_encode(array("Error"=>"No es un sector valido."));
                 }
-                else
-                    $payload = json_encode(array("mensaje" => "Se deben de ingresar todos los campos."));
+
+                if(isset($parametros['tipo'])){
+                    if(in_array($parametros['tipo'],self::$tiposValidos)){
+                        if(isset($parametros['tipo'])){$producto->setTipo($parametros['tipo']);} 
+                    }
+                }
+                
+                Producto::modificar($producto);
+                
+                $payload = json_encode(array("mensaje" => "Producto modificado correctamente!")); 
             }
             else {
                 $payload = json_encode(array("mensaje" => "El ID:" . $id . " no esta asignado a ningun producto."));

@@ -91,7 +91,7 @@
                     Mesa::modificar($idMesa);
                 }
 
-                $payload = json_encode(array("Mensaje" => "Pedido creado con éxito, su codigo es: " . $pedido->getCodigoPedido() . " y el codigo de la mesa: " . $pedido->getIDMesa()));
+                $payload = json_encode(array("Mensaje" => "Pedido creado con éxito, su codigo es: " . $pedido->getCodigoPedido() . " y el codigo de la mesa: " . $idMesa->getCodigoMesa()));
             }
             else{
                 $payload = json_encode(array("Mensaje" => "La mesa asignada no existe!"));
