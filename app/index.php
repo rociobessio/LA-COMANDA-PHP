@@ -40,13 +40,14 @@ $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 //-->Mesas:
 $app->group('/mesas', function (RouteCollectorProxy $group) {
+    $group->get('/mesaMasUsada',  \MesaController::class . '::ConsultarMesaMesaMasUsada')->add(new MWSocios());
     $group->get('[/]',\MesaController::class . '::TraerTodos')->add(new MWSocios());
     // $group->put('/cambiarEstado', \MesaController::class . '::CambiarEstadoMesa')->add(new MWMozos());
     $group->get('/{id}',\MesaController::class . '::TraerUno')->add(new MWSocios());
     $group->post('[/]', \MesaController::class . '::CargarUno')->add(new MWSocios());
+    $group->post('/mostrarCuentaMesa', \MesaController::class . '::MostrarCuentaMesa');//-->Me permtiria ver el total de una mesa
     $group->post('/cobrarMesa', \MesaController::class . '::CobrarMesa')->add(new MWMozos());//-->La moza cobra la mesa
     $group->post('/cerrarMesa', \MesaController::class . '::CerrarMesa')->add(new MWSocios());
-    $group->post('/mostrarCuentaMesa', \MesaController::class . '::MostrarCuentaMesa')->add(new MWMozos());//-->Me permtiria ver el total de una mesa
     $group->delete('/{id}', \MesaController::class . '::BorrarUno')->add(new MWSocios());
 })->add(new MWToken());
 

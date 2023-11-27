@@ -15,49 +15,11 @@ AUTENTIFICADOR JWT:
 2do: en el composer.json poner: "firebase/php-jwt":"4.0"
 Luego tirar en la raiz del proyecto composer update
 
-=============================================================================
-                                PEDIDOS:
-->Cuando hago un ""borrar"" en pedido en realidad es la paga de este.
-
--> Estados: Que no estarías cambiando el estado de un producto individual,
- sino de todo el pedido. Se entrega todo o no se entrega nada.
-
--> Si no pago se pueden agregar items
-
-UPDATE DE ESTADOS: recibe el cod de pedido y el idProd,
-modificara su estado en la tabla intermedia y se cambia el estado del pedio
-
-MANEJO DE ESTADO DE PEDIDOS:
-->se tendra que preparar los productos e ir cambiandole sus estados 
-y en la tabla intermedia se deberia de validar la coincidencia de un mismo pedido
-y cambiarle el estado tambien.
-
-=============================================================================
-                                PRODUCTO:  
-->Producto debreia de tener tambien el tipo estimado de preparacion para
-luego calcular entre todos los productos de un mismo pedido se calcule el de
-mayor tiempo d preparacion 
-
-->Producto deberia de tener un estado para saber como esta si se termino o que
-
--> En producto se deberia de agregar el estado y el id de la tabla Pedido-Producto?
-->prod tiene el estimado de tiempo
-
-===============================================================================
-Ver bien la demora de pedidos porq deberia tirar el estimado de demora no el estimad
-de tiempo? 
-
+============================================================================= 
 DE LOS PDFS QUEDA POR HACER:
-❏ La moza cobra la cuenta.
-❏ 10- Alguno de los socios cierra la mesa.
+❏ La moza cobra la cuenta. 
 ❏ 11- El cliente ingresa el código de mesa y el del pedido junto con los datos de la encuesta.
-❏ 12- Alguno de los socios pide los mejores comentarios
-❏ 13- Alguno de los socios pide la mesa más usada.
-
-
--> LISTADO - EMPLEADOS (fecha logueo - cant. operaciones - suspensión - borrado),
-es decir, tendria que agregar cant operaciones. Pero en realidad las voy sumando a medida
-que van modificando los pedidos.
+❏ 12- Alguno de los socios pide los mejores comentarios.
 
 -> Al terminar de comer se habilita una encuesta con una puntuación del 1 al 10 para:
 ● La mesa.
@@ -70,24 +32,8 @@ atención
 Y TODA LA PARTE DE ADMINISTRADOR/CIRCUITO DE UN PEDIDO (ENCUESTAS, FACTURACIONES Y CIERRE DE MESA)!
 Ver mostrar mesas mas usadas y listar pedidos listos.
 
-================================================================================>
-                                    CORRECCIONES:
--> El metodo ConsultarDemoraPedido en PedidoController.php no funciona.
-
 QUEDA POR HACER:
 -> El circuito de cobro ->se ve la cuenta de la mesa ->se cobra/factura ->se vuelve a cerrar la mesa
--> Se deberia de hacer la encuesta a un cliente.
--> La facturacion como se plantea.
-
-->El ConsultarDemoraPedidoCliente toma mal el tiempo de demora da negativo y no es el caso.
-->Ademas me muestra el estado del pedido en general y yo quisiera el estado de la tabla intermedia.
-
--> Las mesas tienen un código de identificación único (de 5 caracteres) , el cliente al entrar en
-nuestra aplicación puede ingresar ese código junto con el número del pedido y se le mostrará el
-tiempo restante para su pedido.
-
-->Volver a ver todo el circuito  + agregar productos al pedido.
-
-->Mesa mas usada.
-
+-> Se deberia de hacer la encuesta a un cliente. 
+================================================================================> 
  

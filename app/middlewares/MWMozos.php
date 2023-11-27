@@ -21,7 +21,7 @@ class MWMozos{
             }
             else
             {
-                $response->getBody()->write(json_encode(array('Error' => "Accion reservada solamente para los Mozo.")));
+                $response->getBody()->write(json_encode(array('Error' => "Accion reservada solamente para los Mozos.")));
             }
         }
         catch(Exception $excepcion)

@@ -167,7 +167,8 @@
                 $mesa = Mesa::obtenerUno($pedido->getIdMesa());
                 //-->Si esta pagando
                 if($mesa && $mesa->getEstado() === "con cliente pagando"){
-                    $cuenta = Mesa::ObtenerCuenta($codPedido);
+                    // $cuenta = Mesa::ObtenerCuenta($codPedido);
+                    $cuenta = $pedido->getCostoTotal();
                     $mesa->setEstado(self::$estados[3]);//-->pagado
                     Mesa::modificar($mesa);
 
@@ -190,19 +191,23 @@
          * del pedidos.
          */
         public static function MostrarCuentaMesa($request, $response, $args){
-            $codPedido = $args['codPedido'];
-            $pedido = Pedido::obtenerUno($codPedido); 
+            $parametros = $request->getParsedBody();
+            $codPedido = $parametros['codPedido'];
+            // var_dump($codPedido);
+            $pedido = Pedido::obtenerUnoPorCodigoPedido($codPedido);//-->Lo obtengo por el codigo de pedido
+            // var_dump($pedido);
             if($pedido){
                 $mesa = Mesa::obtenerUno($pedido->getIdMesa());
                 if($mesa){
-                    $cuenta = Mesa::ObtenerCuenta($codPedido);
+                    // $cuenta = Mesa::ObtenerCuenta($codPedido);
+                    $costoTotal = $pedido->getCostoTotal();//-->Muestro el total del pedido
                     $mesa->setEstado(self::$estados[2]);//-->Con cliente pagando
-                    Mesa::modificar($mesa);
+                    Mesa::modificar($mesa);//-->Se modifica la mesa.
 
-                    $response->getBody()->write("El total del pedido es: " . $cuenta[0]['SUM(pr.precio)']);
+                    $response->getBody()->write("El total del pedido es: " . $costoTotal);
                 }
             }else{
-                $response->getBody()->write("Ocurrio un error al querer cobrar la mesa!" );
+                $response->getBody()->write("Ocurrio un error al querer mostrar la cuenta de la mesa!" );
             }
 
             return $response->withHeader('Content-Type', 'application/json');
@@ -218,6 +223,18 @@
             $mesa->setEstado(self::$estados[4]);//-->Cerrada
             Mesa::modificar($mesa);
             $response->getBody()->write("Mesa cerrada con exito!");
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+
+        /**
+         * 13- Alguno de los socios pide la mesa más usada.
+         */
+        public static function ConsultarMesaMesaMasUsada($request, $response, $args)
+        {
+            $mesa = Mesa::MesaMasUsada();
+            $payload = json_encode(array("La Mesa mas usada es: "=>$mesa));
+            
+            $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         }
 

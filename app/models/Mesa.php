@@ -112,20 +112,15 @@
             return $consulta->execute();
         }
 
-        public static function ObtenerCuenta($codPedido){
+        /**
+         * Me permtira obtener la mesa mas usada.
+         */
+        public static function MesaMasUsada()
+        {
             $objAccesoDato = AccesoDatos::obtenerObjetoAcceso();
-            $consulta = $objAccesoDato->prepararConsulta(
-                "SELECT p.idMesa , SUM(pr.precio)
-                FROM pedidos as p
-                INNER JOIN productos as pr ON p.idProducto = pr.id
-                WHERE p.codigoPedido = :codigoPedido"
-            );
-
-            $consulta->bindValue(':codigoPedido', $codPedido, PDO::PARAM_STR);
-
+            $consulta = $objAccesoDato->retornarConsulta("SELECT idMesa, COUNT(idMesa) AS `cantidad` FROM pedidos GROUP BY idMesa ORDER BY `cantidad` DESC LIMIT 1");
             $consulta->execute();
-
-            return $consulta->fetchAll(PDO::FETCH_ASSOC);
+            return $consulta->fetchAll(PDO::FETCH_CLASS, 'stdClass');
         }
         
 }
