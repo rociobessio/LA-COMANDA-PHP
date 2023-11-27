@@ -157,6 +157,24 @@
             return $consulta->fetchObject('Pedido');
         }
 
+        /**
+         * Me permtira obtener un pedido
+         * mediante la coincidencia de su codigo de pedido
+         * y el codigo de la mesa.
+         */
+        public static function obtenerUnoPorCodigoPedidoYCodigoMesa($codPedido,$codigoMesa){
+            $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
+            $consulta = $objAccessoDB->retornarConsulta("SELECT p.*
+            FROM pedidos AS p
+            INNER JOIN mesas AS m ON p.idMesa = m.idMesa
+            WHERE p.codigoPedido = :codPedido AND m.codigoMesa = :codigoMesa");
+            $consulta->bindValue(':codPedido', $codPedido, PDO::PARAM_STR);
+            $consulta->bindValue(':codigoMesa', $codigoMesa, PDO::PARAM_STR);
+            $consulta->execute();
+
+            return $consulta->fetchObject('Pedido');
+        }
+
         public static function modificar($pedido){
             // var_dump($pedido);
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
@@ -195,33 +213,64 @@
          * @param int $codigoMesa el codigo de la mesa.
          * @param string $codigoPedido el codigo
          * del pedido a buscar.
-         */
-        public static function ObtenerDemoraPedido($codigoMesa, $codigoPedido) {
-            $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
-            // var_dump($codigoMesa);
-            // var_dump($codigoPedido);
-            $consulta = $objAccessoDB->retornarConsulta("
-                    SELECT 
-                    TIMEDIFF(p.tiempoInicio,pp.tiempoEstimado) AS demora,
-                    p.estado AS estadoPedido,
-                    pr.nombre AS nombreProducto
-                FROM pedidos_productos AS pp
-                INNER JOIN pedidos AS p ON pp.codPedido = p.codigoPedido
-                INNER JOIN productos AS pr ON pp.idProducto = pr.idProducto
-                INNER JOIN mesas AS m ON p.idMesa = m.idMesa
-                WHERE m.codigoMesa = :codigoMesa AND p.codigoPedido = :codigoPedido
-            ");
-            $consulta->bindValue(':codigoMesa', $codigoMesa, PDO::PARAM_STR);
-            $consulta->bindValue(':codigoPedido', $codigoPedido, PDO::PARAM_STR);
-            $consulta->execute();
-            return $consulta->fetchAll(PDO::FETCH_CLASS, 'stdClass');
+        */
+        public static function ObtenerDemoraPedido($codigoMesa, $codigoPedido) { 
+            $pedido = Pedido::obtenerUnoPorCodigoPedidoYCodigoMesa($codigoPedido,$codigoMesa);
+
+            if($pedido){
+                // var_dump($pedido);
+                if($pedido->getEstado() === "En preparacion"){
+                    $restante = Pedido::calcularTiempoDemoraPedido($pedido->getTiempoInicio(),$pedido->getTiempoEstimadoPreparacion());
+                    // var_dump($restante);
+                    if($restante > 0){
+                        return "El tiempo de demora del pedido es: " . $restante . " minutos!";
+                    }
+                    else{
+                        return "El pedido ya deberia de finalizar, quedan: " . $restante . " minutos.";
+                    }
+                }
+                elseif($pedido->getEstado === "pendiente"){
+                    return "El pedido aún no se ha comenzado a preparar.";
+                }
+            }
         }
+
+        /**
+         * En este caso se retornara un arrya con la informacion
+         * sobre la demora de los pedidos en preparacion/pendientes.
+         */
+        public static function ObtenerDemoraPedidosSocios($codigoMesa, $codigoPedido) { 
+            $pedido = Pedido::obtenerUnoPorCodigoPedidoYCodigoMesa($codigoPedido, $codigoMesa);
+        
+            if ($pedido) {
+                if ($pedido->getEstado() === "En preparacion") {
+                    $restante = Pedido::calcularTiempoDemoraPedido($pedido->getTiempoInicio(), $pedido->getTiempoEstimadoPreparacion());
+                    if ($restante > 0) {
+                        return array(
+                            'codigoPedido' => $pedido->getCodigoPedido(),
+                            'demora' => $restante,
+                            'nombreCliente' => $pedido->getNombreCliente(), 
+                        );
+                    } else {
+                        return array(
+                            'codigoPedido' => $pedido->getCodigoPedido(),
+                            'mensaje' => "El pedido ya debería haber finalizado.", 
+                        );
+                    }
+                } elseif ($pedido->getEstado() === "pendiente") {
+                    return array(
+                        'codigoPedido' => $pedido->getCodigoPedido(),
+                        'mensaje' => "El pedido aún no se ha comenzado a preparar.", 
+                    );
+                }
+            }
+        }
+        
         
         /**
          * Listar los pedidos pendientes del tipo de empleado.
          */
-        public static function GetPedidosPendientes($rol)
-        {
+        public static function GetPedidosPendientes($rol){
             $sector = Producto::ValidarPedido($rol);
 
             $objAccessoDB = AccesoDatos::obtenerObjetoAcceso();
@@ -252,5 +301,26 @@
             $consulta->bindValue(':estado', "listo para servir");
             $consulta->execute();
             return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
+        }
+
+        /**
+         * Me va a permitir calcular el tiempo 
+         * de demora de un pedido.
+         */
+        private static function calcularTiempoDemoraPedido($inicio,$tiempoFin){
+            $fechaFin = new DateTime($inicio);
+            $tiempo_array = explode(":", $tiempoFin);
+    
+            $minutos = $tiempo_array[1];
+    
+            $fechaFin->modify("+" . $minutos . " minutes"); 
+
+            $fecha_actual = new DateTime();
+     
+            $intervalo = $fecha_actual->diff($fechaFin);
+     
+            $minutos_restantes = $intervalo->format('%r%I');
+    
+            return intval($minutos_restantes);
         }
 }

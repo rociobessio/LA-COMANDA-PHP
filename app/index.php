@@ -77,7 +77,7 @@ $app->group('/pedidos',function (RouteCollectorProxy $group){
     $group->get('[/]',\PedidoController::class . '::TraerTodos')->add(new MWSocios());
     $group->get('/{id}',\PedidoController::class . '::TraerUno')->add(new MWMozos());
     $group->post('[/]', \PedidoController::class . '::CargarUno')->add(new MWMozos());
-    $group->put('/{id}', \PedidoController::class . '::ModificarUno')->add(new MWMozos());
+    $group->put('/{id}', \PedidoController::class . '::ModificarUno')->add(new MWSocios());
     $group->delete('/{id}', \PedidoController::class . '::BorrarUno')->add(new MWMozos());
     $group->post('/agregarProductosPedido/{codPedido}', \PedidoController::class . '::AgregarProductosAPedido')->add(new MWMozos());
     $group->post('/iniciar/{id}', \PedidoController::class . '::IniciarPedido')->add(new MWPreparador());
